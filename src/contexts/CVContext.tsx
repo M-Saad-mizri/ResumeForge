@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { CVData, CVProfile, TemplateType, defaultCVData, sampleCVData } from '@/types/cv';
+import { CVData, CVProfile, TemplateType, defaultCVData, sampleCVData, SectionId, DEFAULT_SECTION_ORDER } from '@/types/cv';
 
 interface CVContextType {
   profiles: CVProfile[];
@@ -22,6 +22,16 @@ interface CVContextType {
   addLanguage: () => void;
   updateLanguage: (id: string, field: string, value: string) => void;
   removeLanguage: (id: string) => void;
+  // Custom sections
+  addCustomSection: () => void;
+  updateCustomSectionTitle: (sectionId: string, title: string) => void;
+  removeCustomSection: (sectionId: string) => void;
+  addCustomSectionItem: (sectionId: string) => void;
+  updateCustomSectionItem: (sectionId: string, itemId: string, field: string, value: string) => void;
+  removeCustomSectionItem: (sectionId: string, itemId: string) => void;
+  // Section ordering
+  reorderSections: (newOrder: SectionId[]) => void;
+  // Profile management
   saveProfile: (name: string) => void;
   loadProfile: (id: string) => void;
   deleteProfile: (id: string) => void;
@@ -36,11 +46,21 @@ const ACTIVE_KEY = 'cv-builder-active';
 
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
+// Migration helper for old data without new fields
+const migrateCVData = (data: any): CVData => ({
+  ...defaultCVData,
+  ...data,
+  customSections: data.customSections || [],
+  sectionOrder: data.sectionOrder || [...DEFAULT_SECTION_ORDER],
+});
+
 export const CVProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [profiles, setProfiles] = useState<CVProfile[]>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
-      return saved ? JSON.parse(saved) : [];
+      if (!saved) return [];
+      const parsed = JSON.parse(saved);
+      return parsed.map((p: any) => ({ ...p, data: migrateCVData(p.data) }));
     } catch { return []; }
   });
 
@@ -55,7 +75,7 @@ export const CVProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     if (activeProfileId) {
       const profile = profiles.find(p => p.id === activeProfileId);
       if (profile) {
-        setCVDataState(profile.data);
+        setCVDataState(migrateCVData(profile.data));
         setTemplateState(profile.template);
       }
     }
@@ -181,6 +201,69 @@ export const CVProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     }));
   };
 
+  // Custom sections
+  const addCustomSection = () => {
+    const sectionId = `custom-${generateId()}`;
+    setCVDataState(prev => ({
+      ...prev,
+      customSections: [...prev.customSections, { id: sectionId, title: 'New Section', items: [] }],
+      sectionOrder: [...prev.sectionOrder, sectionId],
+    }));
+  };
+
+  const updateCustomSectionTitle = (sectionId: string, title: string) => {
+    setCVDataState(prev => ({
+      ...prev,
+      customSections: prev.customSections.map(s => s.id === sectionId ? { ...s, title } : s),
+    }));
+  };
+
+  const removeCustomSection = (sectionId: string) => {
+    setCVDataState(prev => ({
+      ...prev,
+      customSections: prev.customSections.filter(s => s.id !== sectionId),
+      sectionOrder: prev.sectionOrder.filter(id => id !== sectionId),
+    }));
+  };
+
+  const addCustomSectionItem = (sectionId: string) => {
+    setCVDataState(prev => ({
+      ...prev,
+      customSections: prev.customSections.map(s =>
+        s.id === sectionId
+          ? { ...s, items: [...s.items, { id: generateId(), title: '', subtitle: '', date: '', description: '' }] }
+          : s
+      ),
+    }));
+  };
+
+  const updateCustomSectionItem = (sectionId: string, itemId: string, field: string, value: string) => {
+    setCVDataState(prev => ({
+      ...prev,
+      customSections: prev.customSections.map(s =>
+        s.id === sectionId
+          ? { ...s, items: s.items.map(i => i.id === itemId ? { ...i, [field]: value } : i) }
+          : s
+      ),
+    }));
+  };
+
+  const removeCustomSectionItem = (sectionId: string, itemId: string) => {
+    setCVDataState(prev => ({
+      ...prev,
+      customSections: prev.customSections.map(s =>
+        s.id === sectionId
+          ? { ...s, items: s.items.filter(i => i.id !== itemId) }
+          : s
+      ),
+    }));
+  };
+
+  // Section ordering
+  const reorderSections = (newOrder: SectionId[]) => {
+    setCVDataState(prev => ({ ...prev, sectionOrder: newOrder }));
+  };
+
   const saveProfile = (name: string) => {
     const id = activeProfileId || generateId();
     const profile: CVProfile = {
@@ -197,7 +280,7 @@ export const CVProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     setActiveProfileId(id);
     const profile = profiles.find(p => p.id === id);
     if (profile) {
-      setCVDataState(profile.data);
+      setCVDataState(migrateCVData(profile.data));
       setTemplateState(profile.template);
     }
   };
@@ -230,6 +313,9 @@ export const CVProvider: React.FC<{ children: React.ReactNode }> = ({ children }
       addEducation, updateEducation, removeEducation,
       addSkill, updateSkill, removeSkill,
       addLanguage, updateLanguage, removeLanguage,
+      addCustomSection, updateCustomSectionTitle, removeCustomSection,
+      addCustomSectionItem, updateCustomSectionItem, removeCustomSectionItem,
+      reorderSections,
       saveProfile, loadProfile, deleteProfile, createNewProfile, loadSampleData,
     }}>
       {children}

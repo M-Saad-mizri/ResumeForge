@@ -1,12 +1,43 @@
 import React from 'react';
 import { useCV } from '@/contexts/CVContext';
-import { User, Briefcase, GraduationCap, Star, Globe, Plus, Trash2, Sparkles } from 'lucide-react';
+import { User, Briefcase, GraduationCap, Star, Globe, Plus, Trash2, Sparkles, GripVertical, LayoutList } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Slider } from '@/components/ui/slider';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { SectionId } from '@/types/cv';
+
+const SECTION_LABELS: Record<string, { icon: React.ReactNode; label: string }> = {
+  personal: { icon: <User className="w-4 h-4 text-accent" />, label: 'Personal Information' },
+  experience: { icon: <Briefcase className="w-4 h-4 text-accent" />, label: 'Experience' },
+  education: { icon: <GraduationCap className="w-4 h-4 text-accent" />, label: 'Education' },
+  skills: { icon: <Star className="w-4 h-4 text-accent" />, label: 'Skills' },
+  languages: { icon: <Globe className="w-4 h-4 text-accent" />, label: 'Languages' },
+};
+
+const SortableSection: React.FC<{ id: string; children: React.ReactNode }> = ({ id, children }) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} className="card-elevated px-4 rounded-lg">
+      <div className="flex items-center gap-2 py-3 border-b border-border/50">
+        <button {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground touch-none">
+          <GripVertical className="w-4 h-4" />
+        </button>
+        <div className="flex-1">{children}</div>
+      </div>
+    </div>
+  );
+};
 
 const CVForm = () => {
   const {
@@ -15,26 +46,37 @@ const CVForm = () => {
     addEducation, updateEducation, removeEducation,
     addSkill, updateSkill, removeSkill,
     addLanguage, updateLanguage, removeLanguage,
+    addCustomSection, updateCustomSectionTitle, removeCustomSection,
+    addCustomSectionItem, updateCustomSectionItem, removeCustomSectionItem,
+    reorderSections,
     loadSampleData,
   } = useCV();
 
-  return (
-    <div className="space-y-2">
-      <Button variant="outline" size="sm" onClick={loadSampleData} className="w-full gap-2 mb-2">
-        <Sparkles className="w-4 h-4 text-accent" />
-        Load Sample Data
-      </Button>
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
 
-      <Accordion type="multiple" defaultValue={['personal', 'experience', 'education', 'skills']} className="space-y-2">
-        {/* Personal Info */}
-        <AccordionItem value="personal" className="card-elevated px-4">
-          <AccordionTrigger className="py-3">
-            <div className="flex items-center gap-2 text-sm font-semibold">
-              <User className="w-4 h-4 text-accent" />
-              Personal Information
-            </div>
-          </AccordionTrigger>
-          <AccordionContent className="space-y-3 pb-4">
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      const oldIndex = cvData.sectionOrder.indexOf(active.id as string);
+      const newIndex = cvData.sectionOrder.indexOf(over.id as string);
+      reorderSections(arrayMove(cvData.sectionOrder, oldIndex, newIndex));
+    }
+  };
+
+  const getSectionLabel = (sectionId: SectionId) => {
+    if (SECTION_LABELS[sectionId]) return SECTION_LABELS[sectionId];
+    const custom = cvData.customSections.find(s => s.id === sectionId);
+    return { icon: <LayoutList className="w-4 h-4 text-accent" />, label: custom?.title || 'Custom Section' };
+  };
+
+  const renderSectionContent = (sectionId: SectionId) => {
+    switch (sectionId) {
+      case 'personal':
+        return (
+          <div className="space-y-3 py-3">
             <Input placeholder="Full Name" value={cvData.personalInfo.fullName} onChange={e => updatePersonalInfo('fullName', e.target.value)} />
             <Input placeholder="Job Title" value={cvData.personalInfo.title} onChange={e => updatePersonalInfo('title', e.target.value)} />
             <div className="grid grid-cols-2 gap-2">
@@ -46,19 +88,13 @@ const CVForm = () => {
               <Input placeholder="Website" value={cvData.personalInfo.website} onChange={e => updatePersonalInfo('website', e.target.value)} />
             </div>
             <Textarea placeholder="Professional Summary..." value={cvData.personalInfo.summary} onChange={e => updatePersonalInfo('summary', e.target.value)} rows={3} />
-          </AccordionContent>
-        </AccordionItem>
+          </div>
+        );
 
-        {/* Experience */}
-        <AccordionItem value="experience" className="card-elevated px-4">
-          <AccordionTrigger className="py-3">
-            <div className="flex items-center gap-2 text-sm font-semibold">
-              <Briefcase className="w-4 h-4 text-accent" />
-              Experience ({cvData.experiences.length})
-            </div>
-          </AccordionTrigger>
-          <AccordionContent className="space-y-4 pb-4">
-            {cvData.experiences.map((exp, i) => (
+      case 'experience':
+        return (
+          <div className="space-y-4 py-3">
+            {cvData.experiences.map(exp => (
               <div key={exp.id} className="space-y-2 p-3 rounded-lg bg-muted/50 relative">
                 <button onClick={() => removeExperience(exp.id)} className="absolute top-2 right-2 text-muted-foreground hover:text-destructive transition-colors">
                   <Trash2 className="w-3.5 h-3.5" />
@@ -79,18 +115,12 @@ const CVForm = () => {
             <Button variant="outline" size="sm" onClick={addExperience} className="w-full gap-1.5">
               <Plus className="w-4 h-4" /> Add Experience
             </Button>
-          </AccordionContent>
-        </AccordionItem>
+          </div>
+        );
 
-        {/* Education */}
-        <AccordionItem value="education" className="card-elevated px-4">
-          <AccordionTrigger className="py-3">
-            <div className="flex items-center gap-2 text-sm font-semibold">
-              <GraduationCap className="w-4 h-4 text-accent" />
-              Education ({cvData.education.length})
-            </div>
-          </AccordionTrigger>
-          <AccordionContent className="space-y-4 pb-4">
+      case 'education':
+        return (
+          <div className="space-y-4 py-3">
             {cvData.education.map(edu => (
               <div key={edu.id} className="space-y-2 p-3 rounded-lg bg-muted/50 relative">
                 <button onClick={() => removeEducation(edu.id)} className="absolute top-2 right-2 text-muted-foreground hover:text-destructive transition-colors">
@@ -110,18 +140,12 @@ const CVForm = () => {
             <Button variant="outline" size="sm" onClick={addEducation} className="w-full gap-1.5">
               <Plus className="w-4 h-4" /> Add Education
             </Button>
-          </AccordionContent>
-        </AccordionItem>
+          </div>
+        );
 
-        {/* Skills */}
-        <AccordionItem value="skills" className="card-elevated px-4">
-          <AccordionTrigger className="py-3">
-            <div className="flex items-center gap-2 text-sm font-semibold">
-              <Star className="w-4 h-4 text-accent" />
-              Skills ({cvData.skills.length})
-            </div>
-          </AccordionTrigger>
-          <AccordionContent className="space-y-3 pb-4">
+      case 'skills':
+        return (
+          <div className="space-y-3 py-3">
             {cvData.skills.map(skill => (
               <div key={skill.id} className="flex items-center gap-2">
                 <Input placeholder="Skill name" value={skill.name} onChange={e => updateSkill(skill.id, 'name', e.target.value)} className="flex-1" />
@@ -135,18 +159,12 @@ const CVForm = () => {
             <Button variant="outline" size="sm" onClick={addSkill} className="w-full gap-1.5">
               <Plus className="w-4 h-4" /> Add Skill
             </Button>
-          </AccordionContent>
-        </AccordionItem>
+          </div>
+        );
 
-        {/* Languages */}
-        <AccordionItem value="languages" className="card-elevated px-4">
-          <AccordionTrigger className="py-3">
-            <div className="flex items-center gap-2 text-sm font-semibold">
-              <Globe className="w-4 h-4 text-accent" />
-              Languages ({cvData.languages.length})
-            </div>
-          </AccordionTrigger>
-          <AccordionContent className="space-y-3 pb-4">
+      case 'languages':
+        return (
+          <div className="space-y-3 py-3">
             {cvData.languages.map(lang => (
               <div key={lang.id} className="flex items-center gap-2">
                 <Input placeholder="Language" value={lang.name} onChange={e => updateLanguage(lang.id, 'name', e.target.value)} className="flex-1" />
@@ -170,9 +188,93 @@ const CVForm = () => {
             <Button variant="outline" size="sm" onClick={addLanguage} className="w-full gap-1.5">
               <Plus className="w-4 h-4" /> Add Language
             </Button>
-          </AccordionContent>
-        </AccordionItem>
-      </Accordion>
+          </div>
+        );
+
+      default: {
+        // Custom section
+        const section = cvData.customSections.find(s => s.id === sectionId);
+        if (!section) return null;
+        return (
+          <div className="space-y-3 py-3">
+            <div className="flex items-center gap-2">
+              <Input
+                value={section.title}
+                onChange={e => updateCustomSectionTitle(section.id, e.target.value)}
+                className="font-semibold"
+                placeholder="Section Title"
+              />
+              <button onClick={() => removeCustomSection(section.id)} className="text-muted-foreground hover:text-destructive transition-colors p-1">
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </div>
+            {section.items.map(item => (
+              <div key={item.id} className="space-y-2 p-3 rounded-lg bg-muted/50 relative">
+                <button onClick={() => removeCustomSectionItem(section.id, item.id)} className="absolute top-2 right-2 text-muted-foreground hover:text-destructive transition-colors">
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+                <Input placeholder="Title" value={item.title} onChange={e => updateCustomSectionItem(section.id, item.id, 'title', e.target.value)} />
+                <div className="grid grid-cols-2 gap-2">
+                  <Input placeholder="Subtitle" value={item.subtitle} onChange={e => updateCustomSectionItem(section.id, item.id, 'subtitle', e.target.value)} />
+                  <Input placeholder="Date" value={item.date} onChange={e => updateCustomSectionItem(section.id, item.id, 'date', e.target.value)} />
+                </div>
+                <Textarea placeholder="Description..." value={item.description} onChange={e => updateCustomSectionItem(section.id, item.id, 'description', e.target.value)} rows={2} />
+              </div>
+            ))}
+            <Button variant="outline" size="sm" onClick={() => addCustomSectionItem(section.id)} className="w-full gap-1.5">
+              <Plus className="w-4 h-4" /> Add Item
+            </Button>
+          </div>
+        );
+      }
+    }
+  };
+
+  return (
+    <div className="space-y-2">
+      <div className="flex gap-2">
+        <Button variant="outline" size="sm" onClick={loadSampleData} className="flex-1 gap-2">
+          <Sparkles className="w-4 h-4 text-accent" />
+          Load Sample Data
+        </Button>
+        <Button variant="outline" size="sm" onClick={addCustomSection} className="flex-1 gap-2">
+          <Plus className="w-4 h-4 text-accent" />
+          Custom Section
+        </Button>
+      </div>
+
+      <p className="text-xs text-muted-foreground text-center">
+        <GripVertical className="w-3 h-3 inline" /> Drag sections to reorder them on your CV
+      </p>
+
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <SortableContext items={cvData.sectionOrder} strategy={verticalListSortingStrategy}>
+          <div className="space-y-2">
+            {cvData.sectionOrder.map(sectionId => {
+              const { icon, label } = getSectionLabel(sectionId);
+              const count = sectionId === 'experience' ? cvData.experiences.length
+                : sectionId === 'education' ? cvData.education.length
+                : sectionId === 'skills' ? cvData.skills.length
+                : sectionId === 'languages' ? cvData.languages.length
+                : sectionId.startsWith('custom-') ? (cvData.customSections.find(s => s.id === sectionId)?.items.length || 0)
+                : undefined;
+
+              return (
+                <SortableSection key={sectionId} id={sectionId}>
+                  <details className="group">
+                    <summary className="flex items-center gap-2 text-sm font-semibold cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+                      {icon}
+                      <span className="flex-1">{label}{count !== undefined ? ` (${count})` : ''}</span>
+                      <svg className="w-4 h-4 text-muted-foreground transition-transform group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                    </summary>
+                    {renderSectionContent(sectionId)}
+                  </details>
+                </SortableSection>
+              );
+            })}
+          </div>
+        </SortableContext>
+      </DndContext>
     </div>
   );
 };

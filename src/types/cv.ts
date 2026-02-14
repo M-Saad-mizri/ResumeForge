@@ -41,12 +41,32 @@ export interface Language {
   proficiency: string;
 }
 
+export interface CustomSection {
+  id: string;
+  title: string;
+  items: CustomSectionItem[];
+}
+
+export interface CustomSectionItem {
+  id: string;
+  title: string;
+  subtitle: string;
+  date: string;
+  description: string;
+}
+
+export type SectionId = 'personal' | 'experience' | 'education' | 'skills' | 'languages' | string;
+
+export const DEFAULT_SECTION_ORDER: SectionId[] = ['personal', 'experience', 'education', 'skills', 'languages'];
+
 export interface CVData {
   personalInfo: PersonalInfo;
   experiences: Experience[];
   education: Education[];
   skills: Skill[];
   languages: Language[];
+  customSections: CustomSection[];
+  sectionOrder: SectionId[];
 }
 
 export type TemplateType = 'modern' | 'classic' | 'ats';
@@ -73,6 +93,8 @@ export const defaultCVData: CVData = {
   education: [],
   skills: [],
   languages: [],
+  customSections: [],
+  sectionOrder: [...DEFAULT_SECTION_ORDER],
 };
 
 export const sampleCVData: CVData = {
@@ -128,4 +150,6 @@ export const sampleCVData: CVData = {
     { id: '1', name: 'English', proficiency: 'Native' },
     { id: '2', name: 'Mandarin', proficiency: 'Fluent' },
   ],
+  customSections: [],
+  sectionOrder: [...DEFAULT_SECTION_ORDER],
 };
