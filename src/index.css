@@ -132,8 +132,8 @@
 
   .cv-page {
     width: 210mm;
-    min-height: 297mm;
-    padding: 20mm;
+    min-height: auto;
+    padding: 14mm;
     background: white;
     color: #1a1a1a;
     font-family: 'Inter', sans-serif;
@@ -146,7 +146,8 @@
     .cv-page {
       box-shadow: none;
       margin: 0;
-      padding: 15mm;
+      padding: 10mm;
+      min-height: auto;
     }
   }
 }
