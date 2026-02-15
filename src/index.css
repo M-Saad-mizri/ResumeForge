@@ -137,6 +137,7 @@
     background: white;
     color: #1a1a1a;
     font-family: 'Inter', sans-serif;
+    zoom: 1.2;
   }
 
   @media print {
