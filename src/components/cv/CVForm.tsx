@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { useCV } from '@/contexts/CVContext';
-import { User, Briefcase, GraduationCap, Star, Globe, Plus, Trash2, Sparkles, GripVertical, LayoutList } from 'lucide-react';
+import { User, Briefcase, GraduationCap, Star, Globe, Plus, Trash2, Sparkles, GripVertical, LayoutList, Camera, X } from 'lucide-react';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
@@ -35,6 +36,39 @@ const SortableSection: React.FC<{ id: string; children: React.ReactNode }> = ({ 
         </button>
         <div className="flex-1">{children}</div>
       </div>
+    </div>
+  );
+};
+
+const PhotoUpload: React.FC<{ photo?: string; onUpload: (dataUrl: string) => void; onRemove: () => void }> = ({ photo, onUpload, onRemove }) => {
+  const fileRef = useRef<HTMLInputElement>(null);
+  const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) { alert('Image must be under 2MB'); return; }
+    const reader = new FileReader();
+    reader.onload = () => onUpload(reader.result as string);
+    reader.readAsDataURL(file);
+  };
+  return (
+    <div className="flex items-center gap-3">
+      <div className="relative">
+        <Avatar className="w-16 h-16 border-2 border-border">
+          {photo ? <AvatarImage src={photo} alt="Profile" /> : <AvatarFallback><Camera className="w-5 h-5 text-muted-foreground" /></AvatarFallback>}
+        </Avatar>
+        {photo && (
+          <button onClick={onRemove} className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center">
+            <X className="w-3 h-3" />
+          </button>
+        )}
+      </div>
+      <div>
+        <Button variant="outline" size="sm" onClick={() => fileRef.current?.click()} className="gap-1.5">
+          <Camera className="w-3.5 h-3.5" /> {photo ? 'Change Photo' : 'Upload Photo'}
+        </Button>
+        <p className="text-[10px] text-muted-foreground mt-1">Max 2MB. JPG/PNG.</p>
+      </div>
+      <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={handleFile} />
     </div>
   );
 };
@@ -77,6 +111,11 @@ const CVForm = () => {
       case 'personal':
         return (
           <div className="space-y-3 py-3">
+            <PhotoUpload
+              photo={cvData.personalInfo.photo}
+              onUpload={(dataUrl) => updatePersonalInfo('photo', dataUrl)}
+              onRemove={() => updatePersonalInfo('photo', '')}
+            />
             <Input placeholder="Full Name" value={cvData.personalInfo.fullName} onChange={e => updatePersonalInfo('fullName', e.target.value)} />
             <Input placeholder="Job Title" value={cvData.personalInfo.title} onChange={e => updatePersonalInfo('title', e.target.value)} />
             <div className="grid grid-cols-2 gap-2">
