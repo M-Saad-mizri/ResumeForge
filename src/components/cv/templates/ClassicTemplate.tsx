@@ -102,6 +102,11 @@ const ClassicTemplate: React.FC<{ data: CVData }> = ({ data }) => {
   return (
     <div style={{ fontFamily: "'Georgia', serif", color: '#2d2d2d' }}>
       <div className="text-center mb-6 pb-4" style={{ borderBottom: '2px solid #2d2d2d' }}>
+        {personalInfo.photo && (
+          <div className="mb-3 flex justify-center">
+            <img src={personalInfo.photo} alt="" className="w-16 h-16 rounded-full object-cover border-2" style={{ borderColor: '#2d2d2d' }} />
+          </div>
+        )}
         <h1 className="text-2xl font-bold tracking-wide" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>{personalInfo.fullName || 'Your Name'}</h1>
         <p className="text-sm mt-1" style={{ color: '#666', letterSpacing: '0.1em' }}>{personalInfo.title || 'Job Title'}</p>
         <div className="flex items-center justify-center gap-4 mt-3 text-xs" style={{ color: '#555' }}>

@@ -139,6 +139,11 @@ const ModernTemplate: React.FC<{ data: CVData }> = ({ data }) => {
     <div className="flex min-h-full" style={{ fontFamily: "'Inter', sans-serif", color: '#1a1a2e' }}>
       <div className="w-[35%] p-6" style={{ backgroundColor: '#1a2332', color: '#e8e8e8' }}>
         <div className="mb-6">
+          {personalInfo.photo && (
+            <div className="mb-4 flex justify-center">
+              <img src={personalInfo.photo} alt="" className="w-20 h-20 rounded-full object-cover border-2" style={{ borderColor: '#d4a853' }} />
+            </div>
+          )}
           <h1 className="text-xl font-bold leading-tight" style={{ color: '#fff' }}>{personalInfo.fullName || 'Your Name'}</h1>
           <p className="text-sm mt-1" style={{ color: '#d4a853' }}>{personalInfo.title || 'Job Title'}</p>
         </div>
