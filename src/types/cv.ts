@@ -69,7 +69,7 @@ export interface CVData {
   sectionOrder: SectionId[];
 }
 
-export type TemplateType = 'modern' | 'classic' | 'ats';
+export type TemplateType = 'modern' | 'classic' | 'ats' | 'minimal' | 'creative' | 'executive';
 
 export interface CVProfile {
   id: string;

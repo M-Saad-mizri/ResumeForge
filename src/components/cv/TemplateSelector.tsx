@@ -7,6 +7,9 @@ const templates: { id: TemplateType; name: string; desc: string }[] = [
   { id: 'modern', name: 'Modern', desc: 'Clean sidebar layout' },
   { id: 'classic', name: 'Classic', desc: 'Traditional format' },
   { id: 'ats', name: 'ATS', desc: 'Optimized for scanners' },
+  { id: 'minimal', name: 'Minimal', desc: 'Sleek & understated' },
+  { id: 'creative', name: 'Creative', desc: 'Bold & colorful' },
+  { id: 'executive', name: 'Executive', desc: 'Premium & polished' },
 ];
 
 const TemplateSelector = () => {
