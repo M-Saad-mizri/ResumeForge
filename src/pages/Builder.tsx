@@ -1,12 +1,13 @@
 import React, { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FileText, Download, Save, Plus, ChevronLeft, Eye, Edit3 } from 'lucide-react';
+import { FileText, Download, Save, Plus, ChevronLeft, Eye, Edit3, Image } from 'lucide-react';
 import { useCV } from '@/contexts/CVContext';
 import CVForm from '@/components/cv/CVForm';
 import TemplateSelector from '@/components/cv/TemplateSelector';
 import LivePreview from '@/components/cv/LivePreview';
 import ProfileManager from '@/components/cv/ProfileManager';
 import { useReactToPrint } from 'react-to-print';
+import html2canvas from 'html2canvas';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -23,6 +24,28 @@ const Builder = () => {
     contentRef: printRef,
     documentTitle: activeProfile?.name || 'My CV',
   });
+
+  const handleExportImage = async () => {
+    if (!printRef.current) return;
+    try {
+      toast.loading('Generating HD image...');
+      const canvas = await html2canvas(printRef.current, {
+        scale: 3,
+        useCORS: true,
+        backgroundColor: '#ffffff',
+        logging: false,
+      });
+      const link = document.createElement('a');
+      link.download = `${activeProfile?.name || 'My CV'}.png`;
+      link.href = canvas.toDataURL('image/png', 1.0);
+      link.click();
+      toast.dismiss();
+      toast.success('HD image exported!');
+    } catch {
+      toast.dismiss();
+      toast.error('Failed to export image');
+    }
+  };
 
   const handleSave = () => {
     const name = saveName.trim() || activeProfile?.name || 'My CV';
@@ -82,6 +105,16 @@ const Builder = () => {
           >
             {showPreview ? <Edit3 className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             {showPreview ? 'Edit' : 'Preview'}
+          </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-1.5"
+            onClick={handleExportImage}
+          >
+            <Image className="w-4 h-4" />
+            <span className="hidden sm:inline">HD Image</span>
           </Button>
 
           <Button
