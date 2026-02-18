@@ -1,13 +1,15 @@
-import React, { useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { FileText, Download, Save, Plus, ChevronLeft, Eye, Edit3, Image, Upload, Share2 } from 'lucide-react';
+import React, { useRef, useState, useEffect } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
+import { FileText, Download, Save, Plus, ChevronLeft, Eye, Edit3, Image, Upload, Share2, QrCode } from 'lucide-react';
 import { useCV } from '@/contexts/CVContext';
 import CVForm from '@/components/cv/CVForm';
 import TemplateSelector from '@/components/cv/TemplateSelector';
 import LivePreview from '@/components/cv/LivePreview';
 import ProfileManager from '@/components/cv/ProfileManager';
+import QRShareDialog from '@/components/cv/QRShareDialog';
 import { useReactToPrint } from 'react-to-print';
 import html2canvas from 'html2canvas';
+import { decompressFromEncodedURIComponent } from 'lz-string';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -21,6 +23,29 @@ const Builder = () => {
   const [showPreview, setShowPreview] = useState(false);
   const [saveName, setSaveName] = useState('');
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
+  const [qrDialogOpen, setQrDialogOpen] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Auto-import from QR code URL
+  useEffect(() => {
+    const cvParam = searchParams.get('cv');
+    if (cvParam) {
+      try {
+        const decompressed = decompressFromEncodedURIComponent(cvParam);
+        if (decompressed) {
+          const parsed = JSON.parse(decompressed);
+          if (parsed.cvData && parsed.template) {
+            setCVData(parsed.cvData as CVData);
+            setTemplate(parsed.template as TemplateType);
+            toast.success('CV loaded from QR code! You can now continue editing.');
+          }
+        }
+      } catch {
+        toast.error('Failed to load CV from link.');
+      }
+      setSearchParams({}, { replace: true });
+    }
+  }, []);
 
   const handlePrint = useReactToPrint({
     contentRef: printRef,
@@ -163,6 +188,16 @@ const Builder = () => {
           <Button
             variant="outline"
             size="sm"
+            className="gap-1.5"
+            onClick={() => setQrDialogOpen(true)}
+          >
+            <QrCode className="w-4 h-4" />
+            <span className="hidden sm:inline">QR Share</span>
+          </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
             className="gap-1.5 md:hidden"
             onClick={() => setShowPreview(!showPreview)}
           >
@@ -208,6 +243,8 @@ const Builder = () => {
           </div>
         </div>
       </div>
+
+      <QRShareDialog open={qrDialogOpen} onOpenChange={setQrDialogOpen} />
     </div>
   );
 };
