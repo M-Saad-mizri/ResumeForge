@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { FileText, Download, Save, Plus, ChevronLeft, Eye, Edit3, Image, Upload, Share2, QrCode } from 'lucide-react';
+import { FileText, Download, Save, ChevronLeft, Eye, Edit3, Image, Upload, Share2, QrCode, MoreVertical } from 'lucide-react';
 import { useCV } from '@/contexts/CVContext';
 import CVForm from '@/components/cv/CVForm';
 import TemplateSelector from '@/components/cv/TemplateSelector';
@@ -11,6 +11,7 @@ import { useReactToPrint } from 'react-to-print';
 import html2canvas from 'html2canvas';
 import { decompressFromEncodedURIComponent } from 'lz-string';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -168,36 +169,6 @@ const Builder = () => {
           <Button
             variant="outline"
             size="sm"
-            className="gap-1.5"
-            onClick={() => fileInputRef.current?.click()}
-          >
-            <Upload className="w-4 h-4" />
-            <span className="hidden sm:inline">Import</span>
-          </Button>
-
-          <Button
-            variant="outline"
-            size="sm"
-            className="gap-1.5"
-            onClick={handleExportJSON}
-          >
-            <Share2 className="w-4 h-4" />
-            <span className="hidden sm:inline">Export JSON</span>
-          </Button>
-
-          <Button
-            variant="outline"
-            size="sm"
-            className="gap-1.5"
-            onClick={() => setQrDialogOpen(true)}
-          >
-            <QrCode className="w-4 h-4" />
-            <span className="hidden sm:inline">QR Share</span>
-          </Button>
-
-          <Button
-            variant="outline"
-            size="sm"
             className="gap-1.5 md:hidden"
             onClick={() => setShowPreview(!showPreview)}
           >
@@ -205,15 +176,34 @@ const Builder = () => {
             {showPreview ? 'Edit' : 'Preview'}
           </Button>
 
-          <Button
-            variant="outline"
-            size="sm"
-            className="gap-1.5"
-            onClick={handleExportImage}
-          >
-            <Image className="w-4 h-4" />
-            <span className="hidden sm:inline">HD Image</span>
-          </Button>
+          {/* More actions dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="gap-1.5">
+                <MoreVertical className="w-4 h-4" />
+                <span className="hidden sm:inline">More</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48 bg-popover z-50">
+              <DropdownMenuItem onClick={() => fileInputRef.current?.click()} className="gap-2 cursor-pointer">
+                <Upload className="w-4 h-4" />
+                Import JSON
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleExportJSON} className="gap-2 cursor-pointer">
+                <Share2 className="w-4 h-4" />
+                Export JSON
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setQrDialogOpen(true)} className="gap-2 cursor-pointer">
+                <QrCode className="w-4 h-4" />
+                QR Share
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleExportImage} className="gap-2 cursor-pointer">
+                <Image className="w-4 h-4" />
+                Export HD Image
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           <Button
             size="sm"
