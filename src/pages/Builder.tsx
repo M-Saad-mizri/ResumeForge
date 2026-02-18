@@ -202,16 +202,20 @@ const Builder = () => {
                 <Image className="w-4 h-4" />
                 Export HD Image
               </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handlePrint()} className="gap-2 cursor-pointer sm:hidden">
+                <Download className="w-4 h-4" />
+                Export PDF
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
 
           <Button
             size="sm"
-            className="gap-1.5 btn-gold border-0"
+            className="gap-1.5 btn-gold border-0 hidden sm:inline-flex"
             onClick={() => handlePrint()}
           >
             <Download className="w-4 h-4" />
-            <span className="hidden sm:inline">Export PDF</span>
+            Export PDF
           </Button>
         </div>
       </header>
