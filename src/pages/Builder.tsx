@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FileText, Download, Save, Plus, ChevronLeft, Eye, Edit3, Image } from 'lucide-react';
+import { FileText, Download, Save, Plus, ChevronLeft, Eye, Edit3, Image, Upload, Share2 } from 'lucide-react';
 import { useCV } from '@/contexts/CVContext';
 import CVForm from '@/components/cv/CVForm';
 import TemplateSelector from '@/components/cv/TemplateSelector';
@@ -12,10 +12,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { CVData, TemplateType } from '@/types/cv';
 
 const Builder = () => {
-  const { saveProfile, activeProfile } = useCV();
+  const { saveProfile, activeProfile, cvData, template, setCVData, setTemplate } = useCV();
   const printRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [showPreview, setShowPreview] = useState(false);
   const [saveName, setSaveName] = useState('');
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
@@ -45,6 +47,39 @@ const Builder = () => {
       toast.dismiss();
       toast.error('Failed to export image');
     }
+  };
+
+  const handleExportJSON = () => {
+    const exportData = { cvData, template, exportedAt: new Date().toISOString(), version: 1 };
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+    const link = document.createElement('a');
+    link.download = `${activeProfile?.name || 'My CV'}.json`;
+    link.href = URL.createObjectURL(blob);
+    link.click();
+    URL.revokeObjectURL(link.href);
+    toast.success('CV exported as JSON! Transfer this file to any device to continue editing.');
+  };
+
+  const handleImportJSON = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const parsed = JSON.parse(event.target?.result as string);
+        if (!parsed.cvData || !parsed.template) {
+          toast.error('Invalid CV file format');
+          return;
+        }
+        setCVData(parsed.cvData as CVData);
+        setTemplate(parsed.template as TemplateType);
+        toast.success('CV imported successfully! You can now continue editing.');
+      } catch {
+        toast.error('Failed to read CV file. Make sure it\'s a valid JSON export.');
+      }
+    };
+    reader.readAsText(file);
+    if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   const handleSave = () => {
@@ -96,6 +131,34 @@ const Builder = () => {
               </div>
             </DialogContent>
           </Dialog>
+
+          <input
+            type="file"
+            ref={fileInputRef}
+            accept=".json"
+            onChange={handleImportJSON}
+            className="hidden"
+          />
+
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-1.5"
+            onClick={() => fileInputRef.current?.click()}
+          >
+            <Upload className="w-4 h-4" />
+            <span className="hidden sm:inline">Import</span>
+          </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-1.5"
+            onClick={handleExportJSON}
+          >
+            <Share2 className="w-4 h-4" />
+            <span className="hidden sm:inline">Export JSON</span>
+          </Button>
 
           <Button
             variant="outline"
