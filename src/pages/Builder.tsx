@@ -4,6 +4,7 @@ import { FileText, Download, Save, ChevronLeft, Eye, Edit3, Image, Upload, Share
 import { useCV } from '@/contexts/CVContext';
 import CVForm from '@/components/cv/CVForm';
 import TemplateSelector from '@/components/cv/TemplateSelector';
+import DesignCustomizer from '@/components/cv/DesignCustomizer';
 import LivePreview from '@/components/cv/LivePreview';
 import ProfileManager from '@/components/cv/ProfileManager';
 import QRShareDialog from '@/components/cv/QRShareDialog';
@@ -18,7 +19,7 @@ import { toast } from 'sonner';
 import { CVData, TemplateType } from '@/types/cv';
 
 const Builder = () => {
-  const { saveProfile, activeProfile, cvData, template, setCVData, setTemplate } = useCV();
+  const { saveProfile, activeProfile, cvData, template, designSettings, setCVData, setTemplate } = useCV();
   const printRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [showPreview, setShowPreview] = useState(false);
@@ -76,7 +77,7 @@ const Builder = () => {
   };
 
   const handleExportJSON = () => {
-    const exportData = { cvData, template, exportedAt: new Date().toISOString(), version: 1 };
+    const exportData = { cvData, template, designSettings, exportedAt: new Date().toISOString(), version: 1 };
     const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
     const link = document.createElement('a');
     link.download = `${activeProfile?.name || 'My CV'}.json`;
@@ -226,6 +227,7 @@ const Builder = () => {
         <div className={`w-full md:w-[420px] lg:w-[480px] flex-shrink-0 border-r border-border overflow-y-auto bg-card ${showPreview ? 'hidden md:block' : ''}`}>
           <div className="p-4 space-y-4">
             <TemplateSelector />
+            <DesignCustomizer />
             <CVForm />
           </div>
         </div>

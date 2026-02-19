@@ -71,11 +71,49 @@ export interface CVData {
 
 export type TemplateType = 'modern' | 'classic' | 'ats' | 'minimal' | 'creative' | 'executive';
 
+export interface DesignSettings {
+  accentColor: string;
+  headingFont: string;
+  bodyFont: string;
+  nameFontSize: number;
+  sectionHeadingSize: number;
+  bodyFontSize: number;
+  lineHeight: number;
+  pagePadding: number;
+  sectionSpacing: number;
+  sidebarWidth: number;
+}
+
+export const defaultDesignSettings: DesignSettings = {
+  accentColor: '#d4a853',
+  headingFont: "'Playfair Display', Georgia, serif",
+  bodyFont: "'Inter', sans-serif",
+  nameFontSize: 24,
+  sectionHeadingSize: 12,
+  bodyFontSize: 11,
+  lineHeight: 1.5,
+  pagePadding: 14,
+  sectionSpacing: 24,
+  sidebarWidth: 35,
+};
+
+export const FONT_OPTIONS = [
+  { label: 'Inter', value: "'Inter', sans-serif" },
+  { label: 'Playfair Display', value: "'Playfair Display', Georgia, serif" },
+  { label: 'Georgia', value: "'Georgia', serif" },
+  { label: 'Arial', value: "'Arial', Helvetica, sans-serif" },
+  { label: 'Times New Roman', value: "'Times New Roman', Times, serif" },
+  { label: 'Courier New', value: "'Courier New', monospace" },
+  { label: 'Helvetica Neue', value: "'Helvetica Neue', Helvetica, sans-serif" },
+  { label: 'Garamond', value: "'Garamond', serif" },
+];
+
 export interface CVProfile {
   id: string;
   name: string;
   data: CVData;
   template: TemplateType;
+  designSettings: DesignSettings;
   updatedAt: string;
 }
 
