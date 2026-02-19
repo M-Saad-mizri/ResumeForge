@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { CVData, CVProfile, TemplateType, defaultCVData, sampleCVData, SectionId, DEFAULT_SECTION_ORDER } from '@/types/cv';
+import { CVData, CVProfile, TemplateType, defaultCVData, sampleCVData, SectionId, DEFAULT_SECTION_ORDER, DesignSettings, defaultDesignSettings } from '@/types/cv';
 
 interface CVContextType {
   profiles: CVProfile[];
@@ -7,6 +7,7 @@ interface CVContextType {
   activeProfile: CVProfile | null;
   cvData: CVData;
   template: TemplateType;
+  designSettings: DesignSettings;
   setCVData: (data: CVData) => void;
   updatePersonalInfo: (field: string, value: string) => void;
   setTemplate: (template: TemplateType) => void;
@@ -22,16 +23,15 @@ interface CVContextType {
   addLanguage: () => void;
   updateLanguage: (id: string, field: string, value: string) => void;
   removeLanguage: (id: string) => void;
-  // Custom sections
   addCustomSection: () => void;
   updateCustomSectionTitle: (sectionId: string, title: string) => void;
   removeCustomSection: (sectionId: string) => void;
   addCustomSectionItem: (sectionId: string) => void;
   updateCustomSectionItem: (sectionId: string, itemId: string, field: string, value: string) => void;
   removeCustomSectionItem: (sectionId: string, itemId: string) => void;
-  // Section ordering
   reorderSections: (newOrder: SectionId[]) => void;
-  // Profile management
+  updateDesignSetting: (key: keyof DesignSettings, value: any) => void;
+  resetDesignSettings: () => void;
   saveProfile: (name: string) => void;
   loadProfile: (id: string) => void;
   deleteProfile: (id: string) => void;
@@ -54,13 +54,18 @@ const migrateCVData = (data: any): CVData => ({
   sectionOrder: data.sectionOrder || [...DEFAULT_SECTION_ORDER],
 });
 
+const migrateDesignSettings = (settings: any): DesignSettings => ({
+  ...defaultDesignSettings,
+  ...(settings || {}),
+});
+
 export const CVProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [profiles, setProfiles] = useState<CVProfile[]>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (!saved) return [];
       const parsed = JSON.parse(saved);
-      return parsed.map((p: any) => ({ ...p, data: migrateCVData(p.data) }));
+      return parsed.map((p: any) => ({ ...p, data: migrateCVData(p.data), designSettings: migrateDesignSettings(p.designSettings) }));
     } catch { return []; }
   });
 
@@ -70,6 +75,7 @@ export const CVProvider: React.FC<{ children: React.ReactNode }> = ({ children }
 
   const [cvData, setCVDataState] = useState<CVData>(defaultCVData);
   const [template, setTemplateState] = useState<TemplateType>('modern');
+  const [designSettings, setDesignSettings] = useState<DesignSettings>(defaultDesignSettings);
 
   useEffect(() => {
     if (activeProfileId) {
@@ -77,6 +83,7 @@ export const CVProvider: React.FC<{ children: React.ReactNode }> = ({ children }
       if (profile) {
         setCVDataState(migrateCVData(profile.data));
         setTemplateState(profile.template);
+        setDesignSettings(migrateDesignSettings(profile.designSettings));
       }
     }
   }, [activeProfileId]);
@@ -96,11 +103,11 @@ export const CVProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     if (activeProfileId) {
       setProfiles(prev => prev.map(p =>
         p.id === activeProfileId
-          ? { ...p, data: cvData, template, updatedAt: new Date().toISOString() }
+          ? { ...p, data: cvData, template, designSettings, updatedAt: new Date().toISOString() }
           : p
       ));
     }
-  }, [cvData, template]);
+  }, [cvData, template, designSettings]);
 
   const setCVData = (data: CVData) => setCVDataState(data);
 
@@ -264,10 +271,19 @@ export const CVProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     setCVDataState(prev => ({ ...prev, sectionOrder: newOrder }));
   };
 
+  // Design settings
+  const updateDesignSetting = (key: keyof DesignSettings, value: any) => {
+    setDesignSettings(prev => ({ ...prev, [key]: value }));
+  };
+
+  const resetDesignSettings = () => {
+    setDesignSettings(defaultDesignSettings);
+  };
+
   const saveProfile = (name: string) => {
     const id = activeProfileId || generateId();
     const profile: CVProfile = {
-      id, name, data: cvData, template, updatedAt: new Date().toISOString(),
+      id, name, data: cvData, template, designSettings, updatedAt: new Date().toISOString(),
     };
     setProfiles(prev => {
       const exists = prev.find(p => p.id === id);
@@ -282,6 +298,7 @@ export const CVProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     if (profile) {
       setCVDataState(migrateCVData(profile.data));
       setTemplateState(profile.template);
+      setDesignSettings(migrateDesignSettings(profile.designSettings));
     }
   };
 
@@ -290,6 +307,7 @@ export const CVProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     if (activeProfileId === id) {
       setActiveProfileId(null);
       setCVDataState(defaultCVData);
+      setDesignSettings(defaultDesignSettings);
     }
   };
 
@@ -297,6 +315,7 @@ export const CVProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     setActiveProfileId(null);
     setCVDataState(defaultCVData);
     setTemplateState('modern');
+    setDesignSettings(defaultDesignSettings);
   };
 
   const loadSampleData = () => {
@@ -307,7 +326,7 @@ export const CVProvider: React.FC<{ children: React.ReactNode }> = ({ children }
 
   return (
     <CVContext.Provider value={{
-      profiles, activeProfileId, activeProfile, cvData, template,
+      profiles, activeProfileId, activeProfile, cvData, template, designSettings,
       setCVData, updatePersonalInfo, setTemplate,
       addExperience, updateExperience, removeExperience,
       addEducation, updateEducation, removeEducation,
@@ -315,7 +334,7 @@ export const CVProvider: React.FC<{ children: React.ReactNode }> = ({ children }
       addLanguage, updateLanguage, removeLanguage,
       addCustomSection, updateCustomSectionTitle, removeCustomSection,
       addCustomSectionItem, updateCustomSectionItem, removeCustomSectionItem,
-      reorderSections,
+      reorderSections, updateDesignSetting, resetDesignSettings,
       saveProfile, loadProfile, deleteProfile, createNewProfile, loadSampleData,
     }}>
       {children}

@@ -1,11 +1,11 @@
 import React from 'react';
-import { CVData, SectionId } from '@/types/cv';
+import { CVData, SectionId, DesignSettings } from '@/types/cv';
 
-const MinimalTemplate: React.FC<{ data: CVData }> = ({ data }) => {
+const MinimalTemplate: React.FC<{ data: CVData; design: DesignSettings }> = ({ data, design }) => {
   const { personalInfo, experiences, education, skills, languages, customSections, sectionOrder } = data;
 
   const sectionTitle = (title: string) => (
-    <h2 className="text-[10px] font-medium uppercase tracking-[0.25em] mb-3" style={{ color: '#999' }}>{title}</h2>
+    <h2 className="font-medium uppercase mb-3" style={{ fontSize: `${design.sectionHeadingSize - 2}px`, letterSpacing: '0.25em', color: '#999' }}>{title}</h2>
   );
 
   const renderSection = (sectionId: SectionId) => {
@@ -14,17 +14,17 @@ const MinimalTemplate: React.FC<{ data: CVData }> = ({ data }) => {
       case 'experience':
         if (experiences.length === 0) return null;
         return (
-          <div className="mb-6" key="experience">
+          <div style={{ marginBottom: `${design.sectionSpacing}px` }} key="experience">
             {sectionTitle('Experience')}
             <div className="space-y-4">
               {experiences.map(exp => (
                 <div key={exp.id}>
                   <div className="flex justify-between items-baseline">
-                    <h3 className="text-xs font-semibold" style={{ color: '#1a1a1a' }}>{exp.position}</h3>
-                    <span className="text-[10px]" style={{ color: '#bbb' }}>{exp.startDate} — {exp.current ? 'Present' : exp.endDate}</span>
+                    <h3 className="font-semibold" style={{ fontSize: `${design.bodyFontSize}px`, color: '#1a1a1a' }}>{exp.position}</h3>
+                    <span style={{ fontSize: `${design.bodyFontSize - 1}px`, color: '#bbb' }}>{exp.startDate} — {exp.current ? 'Present' : exp.endDate}</span>
                   </div>
-                  <p className="text-[11px]" style={{ color: '#777' }}>{exp.company}</p>
-                  {exp.description && <p className="text-[11px] mt-1.5 leading-relaxed" style={{ color: '#555' }}>{exp.description}</p>}
+                  <p style={{ fontSize: `${design.bodyFontSize}px`, color: '#777' }}>{exp.company}</p>
+                  {exp.description && <p className="mt-1.5" style={{ fontSize: `${design.bodyFontSize}px`, lineHeight: design.lineHeight, color: '#555' }}>{exp.description}</p>}
                 </div>
               ))}
             </div>
@@ -33,16 +33,16 @@ const MinimalTemplate: React.FC<{ data: CVData }> = ({ data }) => {
       case 'education':
         if (education.length === 0) return null;
         return (
-          <div className="mb-6" key="education">
+          <div style={{ marginBottom: `${design.sectionSpacing}px` }} key="education">
             {sectionTitle('Education')}
             <div className="space-y-3">
               {education.map(edu => (
                 <div key={edu.id} className="flex justify-between items-baseline">
                   <div>
-                    <h3 className="text-xs font-semibold" style={{ color: '#1a1a1a' }}>{edu.degree} in {edu.field}</h3>
-                    <p className="text-[11px]" style={{ color: '#777' }}>{edu.institution}</p>
+                    <h3 className="font-semibold" style={{ fontSize: `${design.bodyFontSize}px`, color: '#1a1a1a' }}>{edu.degree} in {edu.field}</h3>
+                    <p style={{ fontSize: `${design.bodyFontSize}px`, color: '#777' }}>{edu.institution}</p>
                   </div>
-                  <span className="text-[10px]" style={{ color: '#bbb' }}>{edu.startDate} — {edu.endDate}</span>
+                  <span style={{ fontSize: `${design.bodyFontSize - 1}px`, color: '#bbb' }}>{edu.startDate} — {edu.endDate}</span>
                 </div>
               ))}
             </div>
@@ -51,36 +51,36 @@ const MinimalTemplate: React.FC<{ data: CVData }> = ({ data }) => {
       case 'skills':
         if (skills.length === 0) return null;
         return (
-          <div className="mb-6" key="skills">
+          <div style={{ marginBottom: `${design.sectionSpacing}px` }} key="skills">
             {sectionTitle('Skills')}
-            <p className="text-[11px] leading-relaxed" style={{ color: '#555' }}>{skills.map(s => s.name).join('  ·  ')}</p>
+            <p style={{ fontSize: `${design.bodyFontSize}px`, lineHeight: design.lineHeight, color: '#555' }}>{skills.map(s => s.name).join('  ·  ')}</p>
           </div>
         );
       case 'languages':
         if (languages.length === 0) return null;
         return (
-          <div className="mb-6" key="languages">
+          <div style={{ marginBottom: `${design.sectionSpacing}px` }} key="languages">
             {sectionTitle('Languages')}
-            <p className="text-[11px]" style={{ color: '#555' }}>{languages.map(l => `${l.name} (${l.proficiency})`).join('  ·  ')}</p>
+            <p style={{ fontSize: `${design.bodyFontSize}px`, color: '#555' }}>{languages.map(l => `${l.name} (${l.proficiency})`).join('  ·  ')}</p>
           </div>
         );
       default: {
         const section = customSections.find(s => s.id === sectionId);
         if (!section || section.items.length === 0) return null;
         return (
-          <div className="mb-6" key={sectionId}>
+          <div style={{ marginBottom: `${design.sectionSpacing}px` }} key={sectionId}>
             {sectionTitle(section.title)}
             <div className="space-y-3">
               {section.items.map(item => (
                 <div key={item.id}>
                   <div className="flex justify-between items-baseline">
                     <div>
-                      <h3 className="text-xs font-semibold" style={{ color: '#1a1a1a' }}>{item.title}</h3>
-                      {item.subtitle && <p className="text-[11px]" style={{ color: '#777' }}>{item.subtitle}</p>}
+                      <h3 className="font-semibold" style={{ fontSize: `${design.bodyFontSize}px`, color: '#1a1a1a' }}>{item.title}</h3>
+                      {item.subtitle && <p style={{ fontSize: `${design.bodyFontSize}px`, color: '#777' }}>{item.subtitle}</p>}
                     </div>
-                    {item.date && <span className="text-[10px]" style={{ color: '#bbb' }}>{item.date}</span>}
+                    {item.date && <span style={{ fontSize: `${design.bodyFontSize - 1}px`, color: '#bbb' }}>{item.date}</span>}
                   </div>
-                  {item.description && <p className="text-[11px] mt-1.5 leading-relaxed" style={{ color: '#555' }}>{item.description}</p>}
+                  {item.description && <p className="mt-1.5" style={{ fontSize: `${design.bodyFontSize}px`, lineHeight: design.lineHeight, color: '#555' }}>{item.description}</p>}
                 </div>
               ))}
             </div>
@@ -91,11 +91,11 @@ const MinimalTemplate: React.FC<{ data: CVData }> = ({ data }) => {
   };
 
   return (
-    <div style={{ fontFamily: "'Inter', 'Helvetica Neue', sans-serif", color: '#1a1a1a' }}>
+    <div style={{ fontFamily: design.bodyFont, color: '#1a1a1a' }}>
       <div className="mb-8">
-        <h1 className="text-2xl font-light tracking-wide" style={{ color: '#1a1a1a', letterSpacing: '0.08em' }}>{personalInfo.fullName || 'Your Name'}</h1>
-        <p className="text-xs mt-1 font-medium uppercase tracking-[0.15em]" style={{ color: '#999' }}>{personalInfo.title || 'Job Title'}</p>
-        <div className="flex gap-4 mt-3 text-[10px]" style={{ color: '#aaa' }}>
+        <h1 className="font-light tracking-wide" style={{ fontSize: `${design.nameFontSize}px`, fontFamily: design.headingFont, color: '#1a1a1a', letterSpacing: '0.08em' }}>{personalInfo.fullName || 'Your Name'}</h1>
+        <p className="mt-1 font-medium uppercase" style={{ fontSize: `${design.bodyFontSize}px`, letterSpacing: '0.15em', color: '#999' }}>{personalInfo.title || 'Job Title'}</p>
+        <div className="flex gap-4 mt-3" style={{ fontSize: `${design.bodyFontSize - 1}px`, color: '#aaa' }}>
           {personalInfo.email && <span>{personalInfo.email}</span>}
           {personalInfo.phone && <span>{personalInfo.phone}</span>}
           {personalInfo.location && <span>{personalInfo.location}</span>}
@@ -104,8 +104,8 @@ const MinimalTemplate: React.FC<{ data: CVData }> = ({ data }) => {
       </div>
 
       {personalInfo.summary && (
-        <div className="mb-6">
-          <p className="text-[11px] leading-relaxed" style={{ color: '#555' }}>{personalInfo.summary}</p>
+        <div style={{ marginBottom: `${design.sectionSpacing}px` }}>
+          <p style={{ fontSize: `${design.bodyFontSize}px`, lineHeight: design.lineHeight, color: '#555' }}>{personalInfo.summary}</p>
         </div>
       )}
 
