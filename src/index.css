@@ -132,12 +132,12 @@
 
   .cv-page {
     width: 210mm;
-    min-height: auto;
+    min-height: 297mm;
     padding: 14mm;
     background: white;
     color: #1a1a1a;
     font-family: 'Inter', sans-serif;
-    zoom: 1.2;
+    box-sizing: border-box;
   }
 
   @media print {
@@ -148,7 +148,9 @@
       box-shadow: none;
       margin: 0;
       padding: 10mm;
-      min-height: auto;
+      min-height: 297mm;
+      width: 210mm;
+      transform: none !important;
     }
   }
 }
