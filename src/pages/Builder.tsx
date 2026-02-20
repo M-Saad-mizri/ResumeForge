@@ -14,6 +14,7 @@ import { decompressFromEncodedURIComponent } from 'lz-string';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { CVData, TemplateType } from '@/types/cv';
@@ -25,7 +26,9 @@ const Builder = () => {
   const [showPreview, setShowPreview] = useState(false);
   const [saveName, setSaveName] = useState('');
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
-  const [qrDialogOpen, setQrDialogOpen] = useState(false);
+const [qrDialogOpen, setQrDialogOpen] = useState(false);
+  const [importDialogOpen, setImportDialogOpen] = useState(false);
+  const [importJsonText, setImportJsonText] = useState('');
   const [searchParams, setSearchParams] = useSearchParams();
 
   // Auto-import from QR code URL
@@ -87,26 +90,40 @@ const Builder = () => {
     toast.success('CV exported as JSON! Transfer this file to any device to continue editing.');
   };
 
+  const parseAndImportJSON = (jsonString: string) => {
+    try {
+      const parsed = JSON.parse(jsonString);
+      if (!parsed.cvData || !parsed.template) {
+        toast.error('Invalid CV file format');
+        return;
+      }
+      setCVData(parsed.cvData as CVData);
+      setTemplate(parsed.template as TemplateType);
+      setImportDialogOpen(false);
+      setImportJsonText('');
+      toast.success('CV imported successfully! You can now continue editing.');
+    } catch {
+      toast.error('Failed to read CV file. Make sure it\'s valid JSON.');
+    }
+  };
+
   const handleImportJSON = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
     reader.onload = (event) => {
-      try {
-        const parsed = JSON.parse(event.target?.result as string);
-        if (!parsed.cvData || !parsed.template) {
-          toast.error('Invalid CV file format');
-          return;
-        }
-        setCVData(parsed.cvData as CVData);
-        setTemplate(parsed.template as TemplateType);
-        toast.success('CV imported successfully! You can now continue editing.');
-      } catch {
-        toast.error('Failed to read CV file. Make sure it\'s a valid JSON export.');
-      }
+      parseAndImportJSON(event.target?.result as string);
     };
     reader.readAsText(file);
     if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const handleImportFromText = () => {
+    if (!importJsonText.trim()) {
+      toast.error('Please paste JSON content first.');
+      return;
+    }
+    parseAndImportJSON(importJsonText);
   };
 
   const handleSave = () => {
@@ -159,13 +176,6 @@ const Builder = () => {
             </DialogContent>
           </Dialog>
 
-          <input
-            type="file"
-            ref={fileInputRef}
-            accept=".json"
-            onChange={handleImportJSON}
-            className="hidden"
-          />
 
           <Button
             variant="outline"
@@ -186,7 +196,7 @@ const Builder = () => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48 bg-popover z-50">
-              <DropdownMenuItem onClick={() => fileInputRef.current?.click()} className="gap-2 cursor-pointer">
+              <DropdownMenuItem onClick={() => setImportDialogOpen(true)} className="gap-2 cursor-pointer">
                 <Upload className="w-4 h-4" />
                 Import JSON
               </DropdownMenuItem>
@@ -241,6 +251,44 @@ const Builder = () => {
       </div>
 
       <QRShareDialog open={qrDialogOpen} onOpenChange={setQrDialogOpen} />
+
+      <Dialog open={importDialogOpen} onOpenChange={(open) => { setImportDialogOpen(open); if (!open) setImportJsonText(''); }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Import JSON</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-2">
+            <div>
+              <label className="text-sm font-medium text-foreground mb-2 block">Upload a file</label>
+              <input
+                type="file"
+                ref={fileInputRef}
+                accept=".json"
+                onChange={handleImportJSON}
+                className="block w-full text-sm text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-primary file:text-primary-foreground hover:file:bg-primary/90 cursor-pointer"
+              />
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="h-px flex-1 bg-border" />
+              <span className="text-xs text-muted-foreground">OR</span>
+              <div className="h-px flex-1 bg-border" />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-foreground mb-2 block">Paste JSON text</label>
+              <Textarea
+                placeholder='{"cvData": {...}, "template": "modern", ...}'
+                value={importJsonText}
+                onChange={e => setImportJsonText(e.target.value)}
+                rows={6}
+                className="font-mono text-xs"
+              />
+            </div>
+            <Button onClick={handleImportFromText} className="w-full btn-gold border-0" disabled={!importJsonText.trim()}>
+              Import from Text
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
