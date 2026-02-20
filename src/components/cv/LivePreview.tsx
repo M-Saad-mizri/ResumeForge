@@ -28,7 +28,7 @@ const LivePreview = forwardRef<HTMLDivElement>((_, ref) => {
       ref={ref}
       className="cv-page shadow-xl rounded-sm"
       style={{
-        transform: 'scale(0.75)',
+        transform: 'scale(0.5)',
         transformOrigin: 'top center',
         maxWidth: '210mm',
         padding: `${designSettings.pagePadding}mm`,
