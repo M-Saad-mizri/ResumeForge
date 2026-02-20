@@ -30,7 +30,8 @@ const LivePreview = forwardRef<HTMLDivElement>((_, ref) => {
       style={{
         transform: 'scale(0.5)',
         transformOrigin: 'top center',
-        maxWidth: '210mm',
+        width: `${designSettings.pageWidth}mm`,
+        maxWidth: `${designSettings.pageWidth}mm`,
         padding: `${designSettings.pagePadding}mm`,
       }}
     >

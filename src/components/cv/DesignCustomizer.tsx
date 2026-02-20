@@ -135,6 +135,12 @@ const DesignCustomizer = () => {
         <div className="space-y-3 pb-3">
           <div>
             <label className="text-[10px] text-muted-foreground mb-1 flex justify-between">
+              <span>Page Width</span><span>{designSettings.pageWidth}mm</span>
+            </label>
+            <Slider value={[designSettings.pageWidth]} onValueChange={v => updateDesignSetting('pageWidth', v[0])} min={170} max={230} step={1} />
+          </div>
+          <div>
+            <label className="text-[10px] text-muted-foreground mb-1 flex justify-between">
               <span>Page Padding</span><span>{designSettings.pagePadding}mm</span>
             </label>
             <Slider value={[designSettings.pagePadding]} onValueChange={v => updateDesignSetting('pagePadding', v[0])} min={5} max={25} step={1} />

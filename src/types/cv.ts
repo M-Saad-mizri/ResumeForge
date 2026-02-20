@@ -82,6 +82,7 @@ export interface DesignSettings {
   pagePadding: number;
   sectionSpacing: number;
   sidebarWidth: number;
+  pageWidth: number; // mm
 }
 
 export const defaultDesignSettings: DesignSettings = {
@@ -95,6 +96,7 @@ export const defaultDesignSettings: DesignSettings = {
   pagePadding: 14,
   sectionSpacing: 24,
   sidebarWidth: 35,
+  pageWidth: 210,
 };
 
 export const FONT_OPTIONS = [
