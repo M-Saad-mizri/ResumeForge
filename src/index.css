@@ -148,9 +148,15 @@
       box-shadow: none;
       margin: 0;
       padding: 10mm;
-      min-height: 297mm;
+      min-height: auto;
       width: 210mm;
       transform: none !important;
+      page-break-after: auto;
+      page-break-inside: auto;
+    }
+    @page {
+      size: A4;
+      margin: 0;
     }
   }
 }
