@@ -1,6 +1,15 @@
 import { Link } from 'react-router-dom';
 import { FileText, Sparkles, Download, Layout, Shield, Zap, Image, Share2, Upload, QrCode, Palette, Save, Database, Eye, Layers, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
+import imgSampleData from '@/assets/workflow-sample-data.png';
+import imgRealtimeEditing from '@/assets/workflow-realtime-editing.png';
+import imgCustomDesign from '@/assets/workflow-custom-design.png';
+import imgTemplates from '@/assets/workflow-templates.png';
+import imgSaveProfiles from '@/assets/workflow-save-profiles.png';
+import imgPdfExport from '@/assets/workflow-pdf-export.png';
+import imgHdImage from '@/assets/workflow-hd-image.png';
+import imgJsonSharing from '@/assets/workflow-json-sharing.png';
+import imgQrShare from '@/assets/workflow-qr-share.png';
 
 const features = [
   { icon: Layout, title: 'Multiple Templates', desc: 'Choose from Modern, Classic, and ATS-friendly templates' },
@@ -11,25 +20,26 @@ const features = [
   { icon: FileText, title: 'Save Profiles', desc: 'Save multiple CV profiles for different job applications' },
 ];
 
-const WorkflowStep = ({ index, icon: Icon, title, description, steps }: {
+const WorkflowStep = ({ index, icon: Icon, title, description, steps, image }: {
   index: number;
   icon: React.ElementType;
   title: string;
   description: string;
   steps: string[];
+  image?: string;
 }) => (
   <motion.div
     initial={{ opacity: 0, y: 20 }}
     whileInView={{ opacity: 1, y: 0 }}
     viewport={{ once: true }}
     transition={{ delay: 0.05 }}
-    className="flex gap-6 items-start"
+    className="flex flex-col lg:flex-row gap-6 items-start"
   >
-    <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center">
-      <Icon className="w-6 h-6 text-accent" />
-    </div>
     <div className="flex-1">
       <div className="flex items-center gap-3 mb-2">
+        <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center">
+          <Icon className="w-5 h-5 text-accent" />
+        </div>
         <span className="text-xs font-bold uppercase tracking-wider text-accent bg-accent/10 px-2 py-0.5 rounded">Step {index}</span>
         <h3 className="font-display text-xl font-bold text-foreground">{title}</h3>
       </div>
@@ -43,6 +53,11 @@ const WorkflowStep = ({ index, icon: Icon, title, description, steps }: {
         ))}
       </ul>
     </div>
+    {image && (
+      <div className="w-full lg:w-72 flex-shrink-0">
+        <img src={image} alt={title} className="w-full rounded-xl border border-border shadow-sm" loading="lazy" />
+      </div>
+    )}
   </motion.div>
 );
 
@@ -163,38 +178,47 @@ const Index = () => {
           <div className="space-y-12 max-w-4xl mx-auto">
             <WorkflowStep index={1} icon={Database} title="Start with Sample Data"
               description="Not sure where to begin? Load sample data with one click to populate your CV with realistic content. Preview how every template looks before entering your own info."
+              image={imgSampleData}
               steps={['Click "Load Sample Data" in the builder', 'All sections fill with professional example content', 'Explore templates and layouts with real-looking data', 'Replace with your own details when ready']} />
 
             <WorkflowStep index={2} icon={Eye} title="Real-Time Editing & Preview"
               description="Edit on the left panel while changes appear instantly in the live preview on the right. On mobile, toggle between Edit and Preview modes seamlessly."
+              image={imgRealtimeEditing}
               steps={['Fill in personal info, experience, education, skills & languages', 'Add custom sections for certifications, projects, or anything else', 'Drag & drop to reorder sections exactly how you want', 'Every change is reflected in the preview immediately']} />
 
             <WorkflowStep index={3} icon={Palette} title="Custom Design Settings"
               description="Fine-tune every visual aspect of your CV. Adjust accent colors, fonts, spacing, and page width to create a document that's uniquely yours."
+              image={imgCustomDesign}
               steps={['Pick an accent color from the palette or enter a hex code', 'Choose heading and body fonts independently', 'Adjust font sizes for headings and body text', 'Control section spacing and page width (170mm–230mm) with sliders']} />
 
             <WorkflowStep index={4} icon={Layers} title="6 Professional Templates"
               description="Switch between Modern, Classic, Minimal, Creative, Executive, and ATS-Optimized templates. Each respects your design settings — switching is instant and non-destructive."
+              image={imgTemplates}
               steps={['Browse all 6 templates in the Template Selector', 'Click any template to apply it instantly', 'Content and design settings are preserved across switches', 'ATS template is optimized for applicant tracking systems']} />
 
             <WorkflowStep index={5} icon={Save} title="Save Multiple Profiles"
               description="Create different CV versions for different job applications. Each profile stores its own content, template, and design settings. Everything auto-saves as you edit."
+              image={imgSaveProfiles}
               steps={['Click "Save" and name your profile (e.g., "Tech Resume")', 'Switch between saved profiles from the profile manager', 'Each profile remembers its template and design settings', 'Auto-saves every change — never lose your work']} />
 
             <WorkflowStep index={6} icon={Download} title="Export as PDF"
               description="Generate a print-ready PDF with proper A4 formatting. The export uses your browser's print engine for pixel-perfect output with correct margins."
+              image={imgPdfExport}
               steps={['Click "Export PDF" in the top bar', 'Your browser\'s print dialog opens with the CV', 'Choose "Save as PDF" or print directly', 'The PDF respects your exact design settings and page width']} />
 
             <WorkflowStep index={7} icon={Image} title="Export as HD Image"
               description="Download your CV as a high-resolution PNG at 3x scale. Perfect for sharing on social media, portfolios, or anywhere that accepts images."
+              image={imgHdImage}
               steps={['Open the "More" menu (⋮) in the top bar', 'Click "Export HD Image"', 'A 3x resolution PNG is generated and downloaded', 'Maintains crisp text and colors at any zoom level']} />
 
             <WorkflowStep index={8} icon={Share2} title="JSON Export & Import"
               description="Transfer your CV between devices without an account. Export as JSON, then import on any device to continue editing exactly where you left off."
+              image={imgJsonSharing}
               steps={['Export: More menu → "Export JSON" downloads a .json file', 'Import via file: "Import JSON" → upload the file', 'Import via text: Paste raw JSON directly into the import dialog', 'All content, template, and design settings are preserved']} />
 
             <WorkflowStep index={9} icon={QrCode} title="QR Code Sharing"
               description="Generate a QR code containing your entire CV compressed into a URL. Scan from any device to instantly load and edit — no file transfer needed."
+              image={imgQrShare}
               steps={['Open "More" menu → "QR Share"', 'A QR code appears with your compressed CV data', 'Scan with any phone camera to open in browser', 'If data exceeds ~4000 chars, use JSON export instead']} />
           </div>
         </div>
