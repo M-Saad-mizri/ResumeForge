@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { FileText, Download, Save, ChevronLeft, Eye, Edit3, Image, Upload, Share2, QrCode, MoreVertical } from 'lucide-react';
+import { FileText, Download, Save, ChevronLeft, Eye, Edit3, Image, Upload, Share2, QrCode, MoreVertical, Sparkles } from 'lucide-react';
 import { useCV } from '@/contexts/CVContext';
 import CVForm from '@/components/cv/CVForm';
 import TemplateSelector from '@/components/cv/TemplateSelector';
@@ -8,6 +8,7 @@ import DesignCustomizer from '@/components/cv/DesignCustomizer';
 import LivePreview from '@/components/cv/LivePreview';
 import ProfileManager from '@/components/cv/ProfileManager';
 import QRShareDialog from '@/components/cv/QRShareDialog';
+import AIAssistant from '@/components/cv/AIAssistant';
 import { useReactToPrint } from 'react-to-print';
 import html2canvas from 'html2canvas';
 import { decompressFromEncodedURIComponent } from 'lz-string';
@@ -29,6 +30,7 @@ const Builder = () => {
 const [qrDialogOpen, setQrDialogOpen] = useState(false);
   const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [importJsonText, setImportJsonText] = useState('');
+  const [showAI, setShowAI] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
 
   // Auto-import from QR code URL
@@ -149,6 +151,16 @@ const [qrDialogOpen, setQrDialogOpen] = useState(false);
         </div>
 
         <div className="flex items-center gap-2">
+          <Button
+            variant={showAI ? "default" : "outline"}
+            size="sm"
+            className={`gap-1.5 ${showAI ? 'btn-gold border-0' : ''}`}
+            onClick={() => setShowAI(!showAI)}
+          >
+            <Sparkles className="w-4 h-4" />
+            <span className="hidden sm:inline">AI</span>
+          </Button>
+
           <ProfileManager />
 
           <Dialog open={saveDialogOpen} onOpenChange={setSaveDialogOpen}>
@@ -235,6 +247,11 @@ const [qrDialogOpen, setQrDialogOpen] = useState(false);
       <div className="flex-1 flex overflow-hidden">
         {/* Left: Form */}
         <div className={`w-full md:w-[420px] lg:w-[480px] flex-shrink-0 border-r border-border overflow-y-auto bg-card ${showPreview ? 'hidden md:block' : ''}`}>
+          {showAI && (
+            <div className="border-b border-border">
+              <AIAssistant onClose={() => setShowAI(false)} />
+            </div>
+          )}
           <div className="p-4 space-y-4">
             <TemplateSelector />
             <DesignCustomizer />
