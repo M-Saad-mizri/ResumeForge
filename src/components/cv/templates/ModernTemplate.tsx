@@ -11,8 +11,8 @@ const ModernTemplate: React.FC<{ data: CVData; design: DesignSettings }> = ({ da
   const sidebarSections = ['skills', 'languages'];
   const mainSections = ['experience', 'education'];
 
-  const orderedSidebar = sectionOrder.filter(id => sidebarSections.includes(id) || (id.startsWith('custom-') && sectionOrder.indexOf(id) > sectionOrder.indexOf('skills')));
-  const orderedMain = sectionOrder.filter(id => mainSections.includes(id) || (id.startsWith('custom-') && !orderedSidebar.includes(id)));
+  const orderedSidebar = sectionOrder.filter(id => sidebarSections.includes(id));
+  const orderedMain = sectionOrder.filter(id => mainSections.includes(id) || id.startsWith('custom-'));
 
   const renderCustomSection = (sectionId: string, isLight = false) => {
     const section = customSections.find(s => s.id === sectionId);
