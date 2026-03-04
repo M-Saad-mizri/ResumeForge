@@ -196,6 +196,10 @@ const Index = () => {
             <WorkflowStep index={9} icon={QrCode} title="QR Code Sharing"
               description="Generate a QR code containing your entire CV compressed into a URL. Scan from any device to instantly load and edit — no file transfer needed."
               steps={['Open "More" menu → "QR Share"', 'A QR code appears with your compressed CV data', 'Scan with any phone camera to open in browser', 'If data exceeds ~4000 chars, use JSON export instead']} />
+
+            <WorkflowStep index={10} icon={Sparkles} title="AI-Powered Assistant"
+              description="Use built-in AI to supercharge your CV. Generate professional summaries, craft job descriptions, get skill suggestions, receive optimization tips, or paste rough text and let AI structure it into a complete CV."
+              steps={['Rough Text → CV: Paste unstructured info and AI builds your entire CV', 'Summary Generator: Create a polished professional summary from your experience', 'Job Description Writer: Generate impactful bullet points for any role', 'Skill Suggestions: Get relevant skills recommended based on your experience', 'CV Review & Tips: Receive actionable feedback to improve your CV']} />
           </div>
         </div>
       </section>
