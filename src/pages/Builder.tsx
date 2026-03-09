@@ -267,7 +267,7 @@ const [qrDialogOpen, setQrDialogOpen] = useState(false);
         </div>
       </div>
 
-      <QRShareDialog open={qrDialogOpen} onOpenChange={setQrDialogOpen} />
+      <ShareDialog open={qrDialogOpen} onOpenChange={setQrDialogOpen} />
 
       <Dialog open={importDialogOpen} onOpenChange={(open) => { setImportDialogOpen(open); if (!open) setImportJsonText(''); }}>
         <DialogContent>
