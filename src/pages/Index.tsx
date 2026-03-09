@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { FileText, Sparkles, Download, Layout, Shield, Zap, Image, Share2, Upload, QrCode, Palette, Save, Database, Eye, Layers, ArrowRight } from 'lucide-react';
+import { FileText, Sparkles, Download, Layout, Shield, Zap, Image, Share2, Upload, Palette, Save, Database, Eye, Layers, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const features = [
@@ -193,9 +193,9 @@ const Index = () => {
               description="Transfer your CV between devices without an account. Export as JSON, then import on any device to continue editing exactly where you left off."
               steps={['Export: More menu → "Export JSON" downloads a .json file', 'Import via file: "Import JSON" → upload the file', 'Import via text: Paste raw JSON directly into the import dialog', 'All content, template, and design settings are preserved']} />
 
-            <WorkflowStep index={9} icon={QrCode} title="QR Code Sharing"
-              description="Generate a QR code containing your entire CV compressed into a URL. Scan from any device to instantly load and edit — no file transfer needed."
-              steps={['Open "More" menu → "QR Share"', 'A QR code appears with your compressed CV data', 'Scan with any phone camera to open in browser', 'If data exceeds ~4000 chars, use JSON export instead']} />
+            <WorkflowStep index={9} icon={Share2} title="Share via Link"
+              description="Generate a unique shareable link to your CV with one click. Anyone with the link can view and import your CV into their own builder — no account needed. Links are valid for 30 days."
+              steps={['Open "More" menu → "Share via Link"', 'Click "Generate Share Link" to create a unique URL', 'Copy and send the link to anyone', 'Recipients can instantly load your CV and start editing']} />
 
             <WorkflowStep index={10} icon={Sparkles} title="AI-Powered Assistant"
               description="Use built-in AI to supercharge your CV. Generate professional summaries, craft job descriptions, get skill suggestions, receive optimization tips, or paste rough text and let AI structure it into a complete CV."
