@@ -128,6 +128,23 @@ const [qrDialogOpen, setQrDialogOpen] = useState(false);
     parseAndImportJSON(importJsonText);
   };
 
+  const handleDownloadSampleJSON = () => {
+    const sampleExport = {
+      cvData: sampleCVData,
+      template: 'modern' as TemplateType,
+      designSettings: defaultDesignSettings,
+      exportedAt: new Date().toISOString(),
+      version: 1,
+    };
+    const blob = new Blob([JSON.stringify(sampleExport, null, 2)], { type: 'application/json' });
+    const link = document.createElement('a');
+    link.download = 'ResumeForge-Sample.json';
+    link.href = URL.createObjectURL(blob);
+    link.click();
+    URL.revokeObjectURL(link.href);
+    toast.success('Sample JSON downloaded! Edit it and import back to create your CV.');
+  };
+
   const handleSave = () => {
     const name = saveName.trim() || activeProfile?.name || 'My CV';
     saveProfile(name);
