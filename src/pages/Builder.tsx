@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { FileText, Download, Save, ChevronLeft, Eye, Edit3, Image, Upload, Share2, Link2, MoreVertical, Sparkles } from 'lucide-react';
+import { FileText, Download, Save, ChevronLeft, Eye, Edit3, Image, Upload, Share2, Link2, MoreVertical, Sparkles, FileDown } from 'lucide-react';
 import { useCV } from '@/contexts/CVContext';
 import CVForm from '@/components/cv/CVForm';
 import TemplateSelector from '@/components/cv/TemplateSelector';
@@ -18,7 +18,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { CVData, TemplateType } from '@/types/cv';
+import { CVData, TemplateType, sampleCVData, defaultDesignSettings } from '@/types/cv';
 
 const Builder = () => {
   const { saveProfile, activeProfile, cvData, template, designSettings, setCVData, setTemplate } = useCV();
