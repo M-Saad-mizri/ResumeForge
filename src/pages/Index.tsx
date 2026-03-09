@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { FileText, Sparkles, Download, Layout, Shield, Zap, Image, Share2, Upload, QrCode, Palette, Save, Database, Eye, Layers, ArrowRight } from 'lucide-react';
+import { FileText, Sparkles, Download, Layout, Shield, Zap, Image, Share2, Upload, Palette, Save, Database, Eye, Layers, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const features = [
