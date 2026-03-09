@@ -217,8 +217,8 @@ const [qrDialogOpen, setQrDialogOpen] = useState(false);
                 Export JSON
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setQrDialogOpen(true)} className="gap-2 cursor-pointer">
-                <QrCode className="w-4 h-4" />
-                QR Share
+                <Link2 className="w-4 h-4" />
+                Share via Link
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleExportImage} className="gap-2 cursor-pointer">
