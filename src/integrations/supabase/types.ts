@@ -14,7 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      shared_cvs: {
+        Row: {
+          created_at: string
+          cv_data: Json
+          design_settings: Json | null
+          expires_at: string
+          id: string
+          template: string
+        }
+        Insert: {
+          created_at?: string
+          cv_data: Json
+          design_settings?: Json | null
+          expires_at?: string
+          id?: string
+          template: string
+        }
+        Update: {
+          created_at?: string
+          cv_data?: Json
+          design_settings?: Json | null
+          expires_at?: string
+          id?: string
+          template?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

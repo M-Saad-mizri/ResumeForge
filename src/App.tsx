@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CVProvider } from "@/contexts/CVContext";
 import Index from "./pages/Index";
 import Builder from "./pages/Builder";
+import SharedCV from "./pages/SharedCV";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -20,6 +21,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/builder" element={<Builder />} />
+            <Route path="/shared/:id" element={<SharedCV />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

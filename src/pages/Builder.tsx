@@ -1,13 +1,13 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { FileText, Download, Save, ChevronLeft, Eye, Edit3, Image, Upload, Share2, QrCode, MoreVertical, Sparkles } from 'lucide-react';
+import { FileText, Download, Save, ChevronLeft, Eye, Edit3, Image, Upload, Share2, Link2, MoreVertical, Sparkles } from 'lucide-react';
 import { useCV } from '@/contexts/CVContext';
 import CVForm from '@/components/cv/CVForm';
 import TemplateSelector from '@/components/cv/TemplateSelector';
 import DesignCustomizer from '@/components/cv/DesignCustomizer';
 import LivePreview from '@/components/cv/LivePreview';
 import ProfileManager from '@/components/cv/ProfileManager';
-import QRShareDialog from '@/components/cv/QRShareDialog';
+import ShareDialog from '@/components/cv/ShareDialog';
 import AIAssistant from '@/components/cv/AIAssistant';
 import { useReactToPrint } from 'react-to-print';
 import html2canvas from 'html2canvas';
@@ -217,8 +217,8 @@ const [qrDialogOpen, setQrDialogOpen] = useState(false);
                 Export JSON
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setQrDialogOpen(true)} className="gap-2 cursor-pointer">
-                <QrCode className="w-4 h-4" />
-                QR Share
+                <Link2 className="w-4 h-4" />
+                Share via Link
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleExportImage} className="gap-2 cursor-pointer">
@@ -267,7 +267,7 @@ const [qrDialogOpen, setQrDialogOpen] = useState(false);
         </div>
       </div>
 
-      <QRShareDialog open={qrDialogOpen} onOpenChange={setQrDialogOpen} />
+      <ShareDialog open={qrDialogOpen} onOpenChange={setQrDialogOpen} />
 
       <Dialog open={importDialogOpen} onOpenChange={(open) => { setImportDialogOpen(open); if (!open) setImportJsonText(''); }}>
         <DialogContent>
