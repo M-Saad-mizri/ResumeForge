@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CVProvider } from "@/contexts/CVContext";
 import Index from "./pages/Index";
 import Builder from "./pages/Builder";
+import SharedCV from "./pages/SharedCV";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();

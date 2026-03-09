@@ -1,13 +1,13 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { FileText, Download, Save, ChevronLeft, Eye, Edit3, Image, Upload, Share2, QrCode, MoreVertical, Sparkles } from 'lucide-react';
+import { FileText, Download, Save, ChevronLeft, Eye, Edit3, Image, Upload, Share2, Link2, MoreVertical, Sparkles } from 'lucide-react';
 import { useCV } from '@/contexts/CVContext';
 import CVForm from '@/components/cv/CVForm';
 import TemplateSelector from '@/components/cv/TemplateSelector';
 import DesignCustomizer from '@/components/cv/DesignCustomizer';
 import LivePreview from '@/components/cv/LivePreview';
 import ProfileManager from '@/components/cv/ProfileManager';
-import QRShareDialog from '@/components/cv/QRShareDialog';
+import ShareDialog from '@/components/cv/ShareDialog';
 import AIAssistant from '@/components/cv/AIAssistant';
 import { useReactToPrint } from 'react-to-print';
 import html2canvas from 'html2canvas';
