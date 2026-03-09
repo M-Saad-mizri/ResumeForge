@@ -91,7 +91,7 @@ const ShareDialog: React.FC<ShareDialogProps> = ({ open, onOpenChange }) => {
               <div className="flex gap-2">
                 <Input value={shareUrl} readOnly className="font-mono text-xs" />
                 <Button onClick={handleCopy} variant="outline" size="icon" className="shrink-0">
-                  {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+                  {copied ? <Check className="w-4 h-4 text-primary" /> : <Copy className="w-4 h-4" />}
                 </Button>
               </div>
               <p className="text-xs text-muted-foreground text-center">
