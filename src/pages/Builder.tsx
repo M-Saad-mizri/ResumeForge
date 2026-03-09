@@ -224,7 +224,9 @@ const [qrDialogOpen, setQrDialogOpen] = useState(false);
                 <span className="hidden sm:inline">More</span>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48 bg-popover z-50">
+            <DropdownMenuContent align="end" className="w-52 bg-popover z-50">
+              {/* Data Transfer */}
+              <p className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">Data Transfer</p>
               <DropdownMenuItem onClick={() => setImportDialogOpen(true)} className="gap-2 cursor-pointer">
                 <Upload className="w-4 h-4" />
                 Import JSON
@@ -233,11 +235,20 @@ const [qrDialogOpen, setQrDialogOpen] = useState(false);
                 <Share2 className="w-4 h-4" />
                 Export JSON
               </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleDownloadSampleJSON} className="gap-2 cursor-pointer">
+                <FileDown className="w-4 h-4" />
+                Download Sample JSON
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              {/* Sharing */}
+              <p className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">Sharing</p>
               <DropdownMenuItem onClick={() => setQrDialogOpen(true)} className="gap-2 cursor-pointer">
                 <Link2 className="w-4 h-4" />
                 Share via Link
               </DropdownMenuItem>
               <DropdownMenuSeparator />
+              {/* Export */}
+              <p className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">Export</p>
               <DropdownMenuItem onClick={handleExportImage} className="gap-2 cursor-pointer">
                 <Image className="w-4 h-4" />
                 Export HD Image
