@@ -100,19 +100,38 @@ const ModernTemplate: React.FC<{ data: CVData; design: DesignSettings }> = ({ da
     switch (sectionId) {
       case 'skills':
         if (skills.length === 0) return null;
+        const useCompact = skills.length > 5;
         return (
           <div style={{ marginBottom: `${design.sectionSpacing}px` }} key="skills">
             <h2 className="font-bold uppercase tracking-wider mb-3" style={{ color: accent, fontSize: `${design.sectionHeadingSize}px`, fontFamily: design.headingFont }}>Skills</h2>
-            <div className="space-y-2">
-              {skills.map(skill => (
-                <div key={skill.id}>
-                  <div className="flex justify-between mb-1" style={{ fontSize: `${design.bodyFontSize}px` }}><span>{skill.name}</span></div>
-                  <div className="w-full h-1.5 rounded-full" style={{ backgroundColor: 'rgba(255,255,255,0.15)' }}>
-                    <div className="h-full rounded-full" style={{ width: `${(skill.level / 5) * 100}%`, backgroundColor: accent }} />
+            {useCompact ? (
+              <div className="flex flex-wrap gap-1.5">
+                {skills.map(skill => (
+                  <span
+                    key={skill.id}
+                    className="inline-block rounded-sm px-2 py-0.5"
+                    style={{
+                      fontSize: `${design.bodyFontSize - 1}px`,
+                      backgroundColor: 'rgba(255,255,255,0.1)',
+                      borderLeft: `2px solid ${accent}`,
+                    }}
+                  >
+                    {skill.name}
+                  </span>
+                ))}
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {skills.map(skill => (
+                  <div key={skill.id}>
+                    <div className="flex justify-between mb-1" style={{ fontSize: `${design.bodyFontSize}px` }}><span>{skill.name}</span></div>
+                    <div className="w-full h-1.5 rounded-full" style={{ backgroundColor: 'rgba(255,255,255,0.15)' }}>
+                      <div className="h-full rounded-full" style={{ width: `${(skill.level / 5) * 100}%`, backgroundColor: accent }} />
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         );
       case 'languages':
