@@ -89,6 +89,36 @@ const CVForm = () => {
     loadSampleData,
   } = useCV();
 
+  const [aiLoadingId, setAiLoadingId] = useState<string | null>(null);
+
+  const generateDescription = async (expId: string, position: string, company: string) => {
+    if (!position.trim() && !company.trim()) {
+      toast.error('Enter a position or company name first');
+      return;
+    }
+    setAiLoadingId(expId);
+    try {
+      const { data, error } = await supabase.functions.invoke('cv-ai', {
+        body: { action: 'generate_description', payload: { position: position || 'Professional', company: company || 'Company' } },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      if (data?.result) {
+        updateExperience(expId, 'description', data.result);
+        toast.success('Description generated!');
+      }
+    } catch (err: any) {
+      toast.error(err.message || 'AI request failed');
+    } finally {
+      setAiLoadingId(null);
+    }
+  };
+
+  const handleAddExperienceWithAI = async () => {
+    addExperience();
+    // The new experience will be the last one after state updates
+  };
+
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
