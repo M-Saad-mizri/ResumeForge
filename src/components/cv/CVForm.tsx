@@ -181,7 +181,23 @@ const CVForm = () => {
                   <Checkbox checked={exp.current} onCheckedChange={v => updateExperience(exp.id, 'current', !!v)} />
                   <span className="text-xs text-muted-foreground">Currently working here</span>
                 </div>
-                <Textarea placeholder="Description..." value={exp.description} onChange={e => updateExperience(exp.id, 'description', e.target.value)} rows={2} />
+                <div className="relative">
+                  <Textarea placeholder="Description..." value={exp.description} onChange={e => updateExperience(exp.id, 'description', e.target.value)} rows={2} className="pr-10" />
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          onClick={() => generateDescription(exp.id, exp.position, exp.company)}
+                          disabled={aiLoadingId === exp.id}
+                          className="absolute top-2 right-2 p-1 rounded-md text-accent hover:bg-accent/10 transition-colors disabled:opacity-50"
+                        >
+                          {aiLoadingId === exp.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Wand2 className="w-4 h-4" />}
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="left"><p className="text-xs">AI Write Description</p></TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
               </div>
             ))}
             <Button variant="outline" size="sm" onClick={addExperience} className="w-full gap-1.5">
