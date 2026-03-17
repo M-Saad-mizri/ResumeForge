@@ -1,12 +1,15 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { useCV } from '@/contexts/CVContext';
-import { User, Briefcase, GraduationCap, Star, Globe, Plus, Trash2, Sparkles, GripVertical, LayoutList, Camera, X } from 'lucide-react';
+import { User, Briefcase, GraduationCap, Star, Globe, Plus, Trash2, Sparkles, GripVertical, LayoutList, Camera, X, Wand2, Loader2 } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Slider } from '@/components/ui/slider';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -86,6 +89,36 @@ const CVForm = () => {
     loadSampleData,
   } = useCV();
 
+  const [aiLoadingId, setAiLoadingId] = useState<string | null>(null);
+
+  const generateDescription = async (expId: string, position: string, company: string) => {
+    if (!position.trim() && !company.trim()) {
+      toast.error('Enter a position or company name first');
+      return;
+    }
+    setAiLoadingId(expId);
+    try {
+      const { data, error } = await supabase.functions.invoke('cv-ai', {
+        body: { action: 'generate_description', payload: { position: position || 'Professional', company: company || 'Company' } },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      if (data?.result) {
+        updateExperience(expId, 'description', data.result);
+        toast.success('Description generated!');
+      }
+    } catch (err: any) {
+      toast.error(err.message || 'AI request failed');
+    } finally {
+      setAiLoadingId(null);
+    }
+  };
+
+  const handleAddExperienceWithAI = async () => {
+    addExperience();
+    // The new experience will be the last one after state updates
+  };
+
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
@@ -148,7 +181,23 @@ const CVForm = () => {
                   <Checkbox checked={exp.current} onCheckedChange={v => updateExperience(exp.id, 'current', !!v)} />
                   <span className="text-xs text-muted-foreground">Currently working here</span>
                 </div>
-                <Textarea placeholder="Description..." value={exp.description} onChange={e => updateExperience(exp.id, 'description', e.target.value)} rows={2} />
+                <div className="relative">
+                  <Textarea placeholder="Description..." value={exp.description} onChange={e => updateExperience(exp.id, 'description', e.target.value)} rows={2} className="pr-10" />
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          onClick={() => generateDescription(exp.id, exp.position, exp.company)}
+                          disabled={aiLoadingId === exp.id}
+                          className="absolute top-2 right-2 p-1 rounded-md text-accent hover:bg-accent/10 transition-colors disabled:opacity-50"
+                        >
+                          {aiLoadingId === exp.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Wand2 className="w-4 h-4" />}
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="left"><p className="text-xs">AI Write Description</p></TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
               </div>
             ))}
             <Button variant="outline" size="sm" onClick={addExperience} className="w-full gap-1.5">
