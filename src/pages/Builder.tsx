@@ -32,6 +32,9 @@ const [qrDialogOpen, setQrDialogOpen] = useState(false);
   const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [importJsonText, setImportJsonText] = useState('');
   const [showAI, setShowAI] = useState(false);
+  const [linkedinDialogOpen, setLinkedinDialogOpen] = useState(false);
+  const [linkedinText, setLinkedinText] = useState('');
+  const [linkedinLoading, setLinkedinLoading] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
 
   // Auto-import from QR code URL
