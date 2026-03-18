@@ -276,6 +276,13 @@ const [qrDialogOpen, setQrDialogOpen] = useState(false);
                 Download Sample JSON
               </DropdownMenuItem>
               <DropdownMenuSeparator />
+              {/* Import */}
+              <p className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">Import</p>
+              <DropdownMenuItem onClick={() => setLinkedinDialogOpen(true)} className="gap-2 cursor-pointer">
+                <Linkedin className="w-4 h-4" />
+                Import from LinkedIn
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
               {/* Sharing */}
               <p className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">Sharing</p>
               <DropdownMenuItem onClick={() => setQrDialogOpen(true)} className="gap-2 cursor-pointer">
