@@ -377,6 +377,53 @@ const [qrDialogOpen, setQrDialogOpen] = useState(false);
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* LinkedIn Import Dialog */}
+      <Dialog open={linkedinDialogOpen} onOpenChange={(open) => { setLinkedinDialogOpen(open); if (!open) { setLinkedinText(''); setLinkedinLoading(false); } }}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Linkedin className="w-5 h-5 text-[#0A66C2]" />
+              Import from LinkedIn
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-2">
+            <div className="bg-muted/50 border border-border rounded-lg p-3 text-sm text-muted-foreground space-y-2">
+              <p className="font-medium text-foreground">How to copy your LinkedIn profile:</p>
+              <ol className="list-decimal list-inside space-y-1 text-xs">
+                <li>Go to your LinkedIn profile page</li>
+                <li>Select all text on the page (Ctrl+A / Cmd+A)</li>
+                <li>Copy it (Ctrl+C / Cmd+C)</li>
+                <li>Paste it below — AI will extract the relevant info</li>
+              </ol>
+            </div>
+            <Textarea
+              placeholder="Paste your LinkedIn profile text here... (name, headline, experience, education, skills, etc.)"
+              value={linkedinText}
+              onChange={e => setLinkedinText(e.target.value)}
+              rows={8}
+              className="text-sm"
+            />
+            <Button
+              onClick={handleLinkedinImport}
+              className="w-full btn-gold border-0"
+              disabled={!linkedinText.trim() || linkedinLoading}
+            >
+              {linkedinLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  AI is parsing your profile...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  Import with AI
+                </>
+              )}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
