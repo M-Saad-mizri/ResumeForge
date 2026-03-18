@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { FileText, Download, Save, ChevronLeft, Eye, Edit3, Image, Upload, Share2, Link2, MoreVertical, Sparkles, FileDown } from 'lucide-react';
+import { FileText, Download, Save, ChevronLeft, Eye, Edit3, Image, Upload, Share2, Link2, MoreVertical, Sparkles, FileDown, Linkedin, Loader2 } from 'lucide-react';
 import { useCV } from '@/contexts/CVContext';
 import CVForm from '@/components/cv/CVForm';
 import TemplateSelector from '@/components/cv/TemplateSelector';
@@ -19,6 +19,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { CVData, TemplateType, sampleCVData, defaultDesignSettings } from '@/types/cv';
+import { supabase } from '@/integrations/supabase/client';
 
 const Builder = () => {
   const { saveProfile, activeProfile, cvData, template, designSettings, setCVData, setTemplate } = useCV();
@@ -31,6 +32,9 @@ const [qrDialogOpen, setQrDialogOpen] = useState(false);
   const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [importJsonText, setImportJsonText] = useState('');
   const [showAI, setShowAI] = useState(false);
+  const [linkedinDialogOpen, setLinkedinDialogOpen] = useState(false);
+  const [linkedinText, setLinkedinText] = useState('');
+  const [linkedinLoading, setLinkedinLoading] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
 
   // Auto-import from QR code URL
@@ -153,6 +157,38 @@ const [qrDialogOpen, setQrDialogOpen] = useState(false);
     toast.success('CV saved successfully!');
   };
 
+  const handleLinkedinImport = async () => {
+    if (!linkedinText.trim()) {
+      toast.error('Please paste your LinkedIn profile text first.');
+      return;
+    }
+    setLinkedinLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('cv-ai', {
+        body: { action: 'parse_rough_text', payload: { text: linkedinText } },
+      });
+      if (error) throw error;
+      const result = data?.result;
+      if (!result) throw new Error('No result from AI');
+
+      // Extract JSON from possible markdown code blocks
+      let jsonStr = result;
+      const codeBlockMatch = result.match(/```(?:json)?\s*([\s\S]*?)```/);
+      if (codeBlockMatch) jsonStr = codeBlockMatch[1].trim();
+
+      const parsed = JSON.parse(jsonStr) as CVData;
+      setCVData(parsed);
+      setLinkedinDialogOpen(false);
+      setLinkedinText('');
+      toast.success('LinkedIn profile imported! Review and edit your CV.');
+    } catch (err) {
+      console.error('LinkedIn import error:', err);
+      toast.error('Failed to parse LinkedIn data. Try pasting more details.');
+    } finally {
+      setLinkedinLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Top Bar */}
@@ -238,6 +274,13 @@ const [qrDialogOpen, setQrDialogOpen] = useState(false);
               <DropdownMenuItem onClick={handleDownloadSampleJSON} className="gap-2 cursor-pointer">
                 <FileDown className="w-4 h-4" />
                 Download Sample JSON
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              {/* Import */}
+              <p className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">Import</p>
+              <DropdownMenuItem onClick={() => setLinkedinDialogOpen(true)} className="gap-2 cursor-pointer">
+                <Linkedin className="w-4 h-4" />
+                Import from LinkedIn
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               {/* Sharing */}
@@ -330,6 +373,53 @@ const [qrDialogOpen, setQrDialogOpen] = useState(false);
             </div>
             <Button onClick={handleImportFromText} className="w-full btn-gold border-0" disabled={!importJsonText.trim()}>
               Import from Text
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* LinkedIn Import Dialog */}
+      <Dialog open={linkedinDialogOpen} onOpenChange={(open) => { setLinkedinDialogOpen(open); if (!open) { setLinkedinText(''); setLinkedinLoading(false); } }}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Linkedin className="w-5 h-5 text-[#0A66C2]" />
+              Import from LinkedIn
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-2">
+            <div className="bg-muted/50 border border-border rounded-lg p-3 text-sm text-muted-foreground space-y-2">
+              <p className="font-medium text-foreground">How to copy your LinkedIn profile:</p>
+              <ol className="list-decimal list-inside space-y-1 text-xs">
+                <li>Go to your LinkedIn profile page</li>
+                <li>Select all text on the page (Ctrl+A / Cmd+A)</li>
+                <li>Copy it (Ctrl+C / Cmd+C)</li>
+                <li>Paste it below — AI will extract the relevant info</li>
+              </ol>
+            </div>
+            <Textarea
+              placeholder="Paste your LinkedIn profile text here... (name, headline, experience, education, skills, etc.)"
+              value={linkedinText}
+              onChange={e => setLinkedinText(e.target.value)}
+              rows={8}
+              className="text-sm"
+            />
+            <Button
+              onClick={handleLinkedinImport}
+              className="w-full btn-gold border-0"
+              disabled={!linkedinText.trim() || linkedinLoading}
+            >
+              {linkedinLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  AI is parsing your profile...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  Import with AI
+                </>
+              )}
             </Button>
           </div>
         </DialogContent>
