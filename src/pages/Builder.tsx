@@ -19,6 +19,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { CVData, TemplateType, sampleCVData, defaultDesignSettings } from '@/types/cv';
+import { supabase } from '@/integrations/supabase/client';
 
 const Builder = () => {
   const { saveProfile, activeProfile, cvData, template, designSettings, setCVData, setTemplate } = useCV();
