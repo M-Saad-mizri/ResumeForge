@@ -157,6 +157,38 @@ const [qrDialogOpen, setQrDialogOpen] = useState(false);
     toast.success('CV saved successfully!');
   };
 
+  const handleLinkedinImport = async () => {
+    if (!linkedinText.trim()) {
+      toast.error('Please paste your LinkedIn profile text first.');
+      return;
+    }
+    setLinkedinLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('cv-ai', {
+        body: { action: 'parse_rough_text', payload: { text: linkedinText } },
+      });
+      if (error) throw error;
+      const result = data?.result;
+      if (!result) throw new Error('No result from AI');
+
+      // Extract JSON from possible markdown code blocks
+      let jsonStr = result;
+      const codeBlockMatch = result.match(/```(?:json)?\s*([\s\S]*?)```/);
+      if (codeBlockMatch) jsonStr = codeBlockMatch[1].trim();
+
+      const parsed = JSON.parse(jsonStr) as CVData;
+      setCVData(parsed);
+      setLinkedinDialogOpen(false);
+      setLinkedinText('');
+      toast.success('LinkedIn profile imported! Review and edit your CV.');
+    } catch (err) {
+      console.error('LinkedIn import error:', err);
+      toast.error('Failed to parse LinkedIn data. Try pasting more details.');
+    } finally {
+      setLinkedinLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Top Bar */}
