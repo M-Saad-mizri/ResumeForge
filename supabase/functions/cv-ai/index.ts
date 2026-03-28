@@ -11,6 +11,22 @@ const SYSTEM_PROMPTS: Record<string, string> = {
 
   generate_description: `You are a professional CV writer. Given a job position and company, generate 2-4 bullet points describing key achievements and responsibilities. Use strong action verbs and quantify results where possible. Return ONLY the bullet points as plain text separated by newlines, no numbering.`,
 
+  add_related_experience: `You are a professional CV writer. Read the provided CV data and generate exactly 2 related sample experience entries that fit the candidate's title, skills, summary, and existing background. Keep them plausible and useful as editable samples, not fabricated elite-company claims. Return ONLY valid JSON in this exact shape:
+{
+  "experiences": [
+    {"company":"","position":"","startDate":"YYYY-MM","endDate":"YYYY-MM","current":false,"description":""},
+    {"company":"","position":"","startDate":"YYYY-MM","endDate":"YYYY-MM","current":false,"description":""}
+  ]
+}
+Rules:
+- Return exactly 2 experiences.
+- Description should be 2-4 concise bullet-style sentences in plain text.
+- Use realistic companies or generic placeholders if needed.
+- Align strongly with the current CV's direction.
+- If dates are uncertain, use reasonable sample dates.
+- Do not include ids.
+- Return ONLY JSON.`,
+
   suggest_skills: `You are a career advisor. Given a job title and industry context, suggest 8-12 relevant skills. Return a JSON array of objects with "name" (string) and "level" (number 1-5). Example: [{"name":"React","level":4}]. Return ONLY the JSON array.`,
 
   review_cv: `You are a professional CV reviewer. Analyze the provided CV data and give actionable feedback. Structure your response with these sections:
@@ -60,6 +76,9 @@ serve(async (req) => {
         break;
       case "generate_description":
         userMessage = `Position: ${payload.position}\nCompany: ${payload.company}\n${payload.context ? `Additional context: ${payload.context}` : ""}`;
+        break;
+      case "add_related_experience":
+        userMessage = `Here is the current CV data. Generate 2 related sample experiences that fit it:\n${JSON.stringify(payload.cvData, null, 2)}`;
         break;
       case "suggest_skills":
         userMessage = `Job Title: ${payload.title}\n${payload.industry ? `Industry: ${payload.industry}` : ""}`;

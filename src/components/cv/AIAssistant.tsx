@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-import { Sparkles, FileText, Briefcase, Star, MessageSquare, Loader2, Wand2, X, ChevronDown, ChevronUp } from 'lucide-react';
+import { Sparkles, FileText, Briefcase, Star, MessageSquare, Loader2, Wand2, X, ChevronDown, ChevronUp, PlusCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { useCV } from '@/contexts/CVContext';
-import { CVData } from '@/types/cv';
+import { CVData, Experience } from '@/types/cv';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
-type AIAction = 'generate_summary' | 'generate_description' | 'suggest_skills' | 'review_cv' | 'parse_rough_text';
+type AIAction = 'generate_summary' | 'generate_description' | 'suggest_skills' | 'review_cv' | 'parse_rough_text' | 'add_related_experience';
 
 interface AIFeature {
   id: AIAction;
@@ -21,11 +21,22 @@ const AI_FEATURES: AIFeature[] = [
   { id: 'parse_rough_text', icon: <Wand2 className="w-4 h-4" />, title: 'Create CV from Text', description: 'Paste rough info and AI structures it into a CV' },
   { id: 'generate_summary', icon: <FileText className="w-4 h-4" />, title: 'Generate Summary', description: 'AI writes a professional summary' },
   { id: 'generate_description', icon: <Briefcase className="w-4 h-4" />, title: 'Write Job Description', description: 'Generate bullet points for experience' },
+  { id: 'add_related_experience', icon: <PlusCircle className="w-4 h-4" />, title: 'Add Related Experience', description: 'Reads your current CV and adds 2 related sample experiences' },
   { id: 'suggest_skills', icon: <Star className="w-4 h-4" />, title: 'Suggest Skills', description: 'Get relevant skill recommendations' },
   { id: 'review_cv', icon: <MessageSquare className="w-4 h-4" />, title: 'Review My CV', description: 'Get AI feedback and improvement tips' },
 ];
 
 const generateId = () => Math.random().toString(36).substr(2, 9);
+
+const normalizeExperience = (experience: Partial<Experience>): Experience => ({
+  id: generateId(),
+  company: experience.company?.trim() || 'Company',
+  position: experience.position?.trim() || 'Related Role',
+  startDate: experience.startDate?.trim() || '',
+  endDate: experience.endDate?.trim() || '',
+  current: Boolean(experience.current),
+  description: experience.description?.trim() || 'Delivered relevant work aligned with the target role.',
+});
 
 const AIAssistant: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const { cvData, setCVData, updatePersonalInfo } = useCV();
@@ -133,6 +144,41 @@ const AIAssistant: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     }
   };
 
+  const handleAddRelatedExperience = async () => {
+    if (!cvData.personalInfo.title.trim() && cvData.skills.length === 0 && cvData.experiences.length === 0) {
+      toast.error('Add a title, skills, or at least one experience first');
+      return;
+    }
+
+    const res = await callAI('add_related_experience', { cvData });
+    if (!res) return;
+
+    try {
+      const cleaned = res.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+      const parsed = JSON.parse(cleaned);
+      const experiences = Array.isArray(parsed)
+        ? parsed
+        : Array.isArray(parsed?.experiences)
+          ? parsed.experiences
+          : [];
+
+      if (experiences.length === 0) {
+        throw new Error('No experiences were generated');
+      }
+
+      const newExperiences = experiences.slice(0, 2).map(normalizeExperience);
+      setCVData({
+        ...cvData,
+        experiences: [...cvData.experiences, ...newExperiences],
+      });
+      toast.success(`${newExperiences.length} related sample experiences added!`);
+      setResult(null);
+      setActiveFeature(null);
+    } catch {
+      setResult('Failed to parse AI response. Here\'s the raw output:\n\n' + res);
+    }
+  };
+
   const renderFeatureForm = () => {
     switch (activeFeature) {
       case 'parse_rough_text':
@@ -188,6 +234,21 @@ const AIAssistant: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           </div>
         );
 
+      case 'add_related_experience':
+        return (
+          <div className="space-y-3">
+            <div className="rounded-lg bg-muted/50 p-3 text-sm text-muted-foreground space-y-2">
+              <p>AI will read your current CV title, summary, skills, and existing experience.</p>
+              <p>It will then add 2 related sample experiences directly into your experience section.</p>
+            </div>
+            <Button onClick={handleAddRelatedExperience} disabled={loading} className="w-full btn-gold border-0 gap-2">
+              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <PlusCircle className="w-4 h-4" />}
+              Add 2 Related Experiences
+            </Button>
+            {result && <div className="p-3 rounded-lg bg-muted/50 text-sm whitespace-pre-wrap">{result}</div>}
+          </div>
+        );
+
       case 'suggest_skills':
         return (
           <div className="space-y-3">
@@ -224,7 +285,12 @@ const AIAssistant: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           <Sparkles className="w-5 h-5 text-accent" />
           <h3 className="font-display text-base font-semibold">AI Assistant</h3>
         </div>
-        <button onClick={onClose} className="text-muted-foreground hover:text-foreground">
+        <button
+          onClick={onClose}
+          className="text-muted-foreground hover:text-foreground"
+          aria-label="Close AI Assistant"
+          title="Close AI Assistant"
+        >
           <X className="w-4 h-4" />
         </button>
       </div>
