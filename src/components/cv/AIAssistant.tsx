@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sparkles, FileText, Briefcase, Star, MessageSquare, Loader2, Wand2, X, ChevronDown, ChevronUp, PlusCircle } from 'lucide-react';
+import { Sparkles, FileText, Briefcase, Star, MessageSquare, Loader2, Wand2, X, ChevronDown, ChevronUp, PlusCircle, Mail, Copy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
@@ -8,7 +8,7 @@ import { CVData, Experience } from '@/types/cv';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
-type AIAction = 'generate_summary' | 'generate_description' | 'suggest_skills' | 'review_cv' | 'parse_rough_text' | 'add_related_experience';
+type AIAction = 'generate_summary' | 'generate_description' | 'suggest_skills' | 'review_cv' | 'parse_rough_text' | 'add_related_experience' | 'generate_cover_letter';
 
 interface AIFeature {
   id: AIAction;
@@ -22,6 +22,7 @@ const AI_FEATURES: AIFeature[] = [
   { id: 'generate_summary', icon: <FileText className="w-4 h-4" />, title: 'Generate Summary', description: 'AI writes a professional summary' },
   { id: 'generate_description', icon: <Briefcase className="w-4 h-4" />, title: 'Write Job Description', description: 'Generate bullet points for experience' },
   { id: 'add_related_experience', icon: <PlusCircle className="w-4 h-4" />, title: 'Add Related Experience', description: 'Reads your current CV and adds 2 related sample experiences' },
+  { id: 'generate_cover_letter', icon: <Mail className="w-4 h-4" />, title: 'Generate Cover Letter', description: 'Creates a tailored cover letter from your CV data' },
   { id: 'suggest_skills', icon: <Star className="w-4 h-4" />, title: 'Suggest Skills', description: 'Get relevant skill recommendations' },
   { id: 'review_cv', icon: <MessageSquare className="w-4 h-4" />, title: 'Review My CV', description: 'Get AI feedback and improvement tips' },
 ];
@@ -118,6 +119,10 @@ const AIAssistant: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const [descPosition, setDescPosition] = useState('');
   const [descCompany, setDescCompany] = useState('');
   const [skillsTitle, setSkillsTitle] = useState(cvData.personalInfo.title || '');
+  const [coverRole, setCoverRole] = useState(cvData.personalInfo.title || '');
+  const [coverCompany, setCoverCompany] = useState('');
+  const [coverTone, setCoverTone] = useState<'professional' | 'confident' | 'friendly'>('professional');
+  const [coverJobFocus, setCoverJobFocus] = useState('');
 
   const callAI = async (action: AIAction, payload: Record<string, unknown>) => {
     setLoading(true);
@@ -283,6 +288,79 @@ const AIAssistant: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     setActiveFeature(null);
   };
 
+  const handleGenerateCoverLetter = () => {
+    const fullName = cvData.personalInfo.fullName.trim();
+    const title = cvData.personalInfo.title.trim();
+    const summary = cvData.personalInfo.summary.trim();
+
+    if (!fullName || (!title && cvData.experiences.length === 0 && cvData.skills.length === 0)) {
+      toast.error('Add your name and some CV details first (title, experience, or skills).');
+      return;
+    }
+
+    const targetRole = coverRole.trim() || title || 'the role';
+    const targetCompany = coverCompany.trim() || 'your organization';
+
+    const topSkills = cvData.skills
+      .filter(s => s.name.trim())
+      .sort((a, b) => b.level - a.level)
+      .slice(0, 5)
+      .map(s => s.name.trim());
+
+    const recentExperience = cvData.experiences.slice(0, 2).map(exp => {
+      const role = exp.position.trim() || 'a key role';
+      const company = exp.company.trim() || 'a previous organization';
+      const snippet = exp.description.trim();
+      const sentence = snippet
+        ? snippet.replace(/\s+/g, ' ').split(/(?<=[.!?])\s+/)[0]
+        : '';
+      return { role, company, sentence };
+    });
+
+    const toneLine =
+      coverTone === 'confident'
+        ? 'I bring a proven track record of delivering high-impact outcomes in fast-paced environments.'
+        : coverTone === 'friendly'
+          ? 'I enjoy collaborating across teams and building practical solutions that create real value.'
+          : 'I am excited to contribute my background and experience to your team.';
+
+    const jobFocusLine = coverJobFocus.trim()
+      ? `I am particularly drawn to this opportunity because ${coverJobFocus.trim()}.`
+      : 'I am particularly interested in this opportunity because it aligns with my experience and career focus.';
+
+    const skillsLine = topSkills.length > 0
+      ? `My strongest areas include ${topSkills.slice(0, 4).join(', ')}${topSkills.length > 4 ? ', and more' : ''}.`
+      : '';
+
+    const experienceLine = recentExperience.length > 0
+      ? recentExperience
+          .map((exp) => exp.sentence
+            ? `In my ${exp.role} role at ${exp.company}, ${exp.sentence.charAt(0).toLowerCase() + exp.sentence.slice(1)}`
+            : `In my ${exp.role} role at ${exp.company}, I handled responsibilities relevant to ${targetRole}.`)
+          .join(' ')
+      : '';
+
+    const opening = `Dear Hiring Manager,\n\nI am writing to express my interest in the ${targetRole} position at ${targetCompany}. ${toneLine}`;
+    const middle = [summary ? summary : '', skillsLine, experienceLine, jobFocusLine]
+      .filter(Boolean)
+      .join(' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+    const closing = `\n\nThank you for your time and consideration. I would welcome the opportunity to discuss how my background can support ${targetCompany}.\n\nSincerely,\n${fullName}`;
+
+    setResult(`${opening}\n\n${middle}${closing}`.trim());
+  };
+
+  const handleCopyResult = async () => {
+    if (!result) return;
+    try {
+      await navigator.clipboard.writeText(result);
+      toast.success('Copied to clipboard!');
+    } catch {
+      toast.error('Could not copy automatically. Please select and copy manually.');
+    }
+  };
+
   const renderFeatureForm = () => {
     switch (activeFeature) {
       case 'parse_rough_text':
@@ -361,6 +439,59 @@ const AIAssistant: React.FC<{ onClose: () => void }> = ({ onClose }) => {
               Suggest Skills
             </Button>
             {result && <div className="p-3 rounded-lg bg-muted/50 text-sm whitespace-pre-wrap">{result}</div>}
+          </div>
+        );
+
+      case 'generate_cover_letter':
+        return (
+          <div className="space-y-3">
+            <div className="rounded-lg bg-muted/50 p-3 text-xs text-muted-foreground">
+              Uses your existing CV data to draft a clean cover letter. Add optional targeting details below.
+            </div>
+            <Input
+              placeholder="Target role (optional)"
+              value={coverRole}
+              onChange={e => setCoverRole(e.target.value)}
+            />
+            <Input
+              placeholder="Company name (optional)"
+              value={coverCompany}
+              onChange={e => setCoverCompany(e.target.value)}
+            />
+            <select
+              value={coverTone}
+              onChange={e => setCoverTone(e.target.value as 'professional' | 'confident' | 'friendly')}
+              aria-label="Cover letter tone"
+              title="Cover letter tone"
+              className="w-full px-3 py-2 rounded-md border border-input bg-background text-sm"
+            >
+              <option value="professional">Tone: Professional</option>
+              <option value="confident">Tone: Confident</option>
+              <option value="friendly">Tone: Friendly</option>
+            </select>
+            <Textarea
+              placeholder="Optional focus from job post (e.g., mission, responsibilities, key requirements)"
+              value={coverJobFocus}
+              onChange={e => setCoverJobFocus(e.target.value)}
+              rows={3}
+              className="text-sm"
+            />
+            <Button onClick={handleGenerateCoverLetter} className="w-full btn-gold border-0 gap-2">
+              <Mail className="w-4 h-4" />
+              Generate Cover Letter
+            </Button>
+
+            {result && (
+              <div className="space-y-2">
+                <div className="rounded-lg border border-border bg-muted/30 p-4 text-sm whitespace-pre-wrap leading-relaxed">
+                  {result}
+                </div>
+                <Button onClick={handleCopyResult} variant="outline" size="sm" className="w-full gap-2">
+                  <Copy className="w-3.5 h-3.5" />
+                  Copy Cover Letter
+                </Button>
+              </div>
+            )}
           </div>
         );
 

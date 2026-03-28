@@ -97,6 +97,131 @@ const Builder = () => {
     toast.success('CV exported as JSON! Transfer this file to any device to continue editing.');
   };
 
+  const handleExportATSText = () => {
+    const lines: string[] = [];
+    const p = cvData.personalInfo;
+
+    lines.push(p.fullName || 'Your Name');
+    if (p.title) lines.push(p.title);
+    lines.push('');
+    if (p.email) lines.push(`Email: ${p.email}`);
+    if (p.phone) lines.push(`Phone: ${p.phone}`);
+    if (p.location) lines.push(`Location: ${p.location}`);
+    if (p.website) lines.push(`Website: ${p.website}`);
+
+    if (p.summary.trim()) {
+      lines.push('');
+      lines.push('SUMMARY');
+      lines.push(p.summary.trim());
+    }
+
+    if (cvData.experiences.length > 0) {
+      lines.push('');
+      lines.push('EXPERIENCE');
+      cvData.experiences.forEach((exp) => {
+        const dates = [exp.startDate || '', exp.current ? 'Present' : (exp.endDate || '')].filter(Boolean).join(' - ');
+        lines.push(`${exp.position || 'Role'} | ${exp.company || 'Company'}${dates ? ` | ${dates}` : ''}`);
+        if (exp.description.trim()) lines.push(`- ${exp.description.trim()}`);
+      });
+    }
+
+    if (cvData.education.length > 0) {
+      lines.push('');
+      lines.push('EDUCATION');
+      cvData.education.forEach((edu) => {
+        const dates = [edu.startDate || '', edu.endDate || ''].filter(Boolean).join(' - ');
+        lines.push(`${edu.degree || ''}${edu.field ? `, ${edu.field}` : ''} | ${edu.institution || ''}${dates ? ` | ${dates}` : ''}`.trim());
+        if (edu.description.trim()) lines.push(`- ${edu.description.trim()}`);
+      });
+    }
+
+    if (cvData.skills.length > 0) {
+      lines.push('');
+      lines.push('SKILLS');
+      lines.push(cvData.skills.map(s => s.name).filter(Boolean).join(', '));
+    }
+
+    if (cvData.languages.length > 0) {
+      lines.push('');
+      lines.push('LANGUAGES');
+      cvData.languages.forEach((lang) => lines.push(`${lang.name} (${lang.proficiency})`));
+    }
+
+    const blob = new Blob([lines.join('\n')], { type: 'text/plain;charset=utf-8' });
+    const link = document.createElement('a');
+    link.download = `${activeProfile?.name || 'My CV'}-ATS.txt`;
+    link.href = URL.createObjectURL(blob);
+    link.click();
+    URL.revokeObjectURL(link.href);
+    toast.success('ATS-friendly text exported!');
+  };
+
+  const handleExportMarkdown = () => {
+    const p = cvData.personalInfo;
+    const md: string[] = [];
+
+    md.push(`# ${p.fullName || 'Your Name'}`);
+    if (p.title) md.push(`**${p.title}**`);
+    md.push('');
+
+    const contact = [
+      p.email ? `- Email: ${p.email}` : '',
+      p.phone ? `- Phone: ${p.phone}` : '',
+      p.location ? `- Location: ${p.location}` : '',
+      p.website ? `- Website: ${p.website}` : '',
+    ].filter(Boolean);
+    md.push(...contact);
+
+    if (p.summary.trim()) {
+      md.push('');
+      md.push('## Summary');
+      md.push(p.summary.trim());
+    }
+
+    if (cvData.experiences.length > 0) {
+      md.push('');
+      md.push('## Experience');
+      cvData.experiences.forEach((exp) => {
+        const dates = [exp.startDate || '', exp.current ? 'Present' : (exp.endDate || '')].filter(Boolean).join(' - ');
+        md.push(`### ${exp.position || 'Role'} - ${exp.company || 'Company'}`);
+        if (dates) md.push(`*${dates}*`);
+        if (exp.description.trim()) md.push(exp.description.trim());
+        md.push('');
+      });
+    }
+
+    if (cvData.education.length > 0) {
+      md.push('## Education');
+      cvData.education.forEach((edu) => {
+        const dates = [edu.startDate || '', edu.endDate || ''].filter(Boolean).join(' - ');
+        md.push(`### ${edu.degree || 'Degree'}${edu.field ? `, ${edu.field}` : ''}`);
+        md.push(`${edu.institution || 'Institution'}${dates ? ` (${dates})` : ''}`);
+        if (edu.description.trim()) md.push(edu.description.trim());
+        md.push('');
+      });
+    }
+
+    if (cvData.skills.length > 0) {
+      md.push('## Skills');
+      md.push(cvData.skills.map(s => s.name).filter(Boolean).join(', '));
+      md.push('');
+    }
+
+    if (cvData.languages.length > 0) {
+      md.push('## Languages');
+      cvData.languages.forEach((lang) => md.push(`- ${lang.name} (${lang.proficiency})`));
+      md.push('');
+    }
+
+    const blob = new Blob([md.join('\n')], { type: 'text/markdown;charset=utf-8' });
+    const link = document.createElement('a');
+    link.download = `${activeProfile?.name || 'My CV'}.md`;
+    link.href = URL.createObjectURL(blob);
+    link.click();
+    URL.revokeObjectURL(link.href);
+    toast.success('Markdown CV exported!');
+  };
+
   const parseAndImportJSON = (jsonString: string) => {
     try {
       const parsed = JSON.parse(jsonString);
@@ -296,6 +421,14 @@ const Builder = () => {
               <DropdownMenuItem onClick={handleExportImage} className="gap-2 cursor-pointer">
                 <Image className="w-4 h-4" />
                 Export HD Image
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleExportATSText} className="gap-2 cursor-pointer">
+                <FileText className="w-4 h-4" />
+                Export ATS Text
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleExportMarkdown} className="gap-2 cursor-pointer">
+                <FileDown className="w-4 h-4" />
+                Export Markdown
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => handlePrint()} className="gap-2 cursor-pointer sm:hidden">
                 <Download className="w-4 h-4" />

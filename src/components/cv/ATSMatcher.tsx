@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Gauge, Target, CheckCircle2, AlertTriangle, ChevronDown } from 'lucide-react';
+import { Gauge, Target, CheckCircle2, AlertTriangle, ChevronDown, ListChecks, BarChart3, Wand2 } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -24,6 +24,13 @@ const improvementTips = [
   'Add missing terms naturally to summary and achievement bullets instead of keyword stuffing.',
   'Use measurable outcomes and concrete technologies rather than generic claims.',
 ];
+
+const STRONG_VERBS = [
+  'Led', 'Designed', 'Built', 'Implemented', 'Delivered', 'Optimized', 'Streamlined', 'Improved',
+  'Launched', 'Managed', 'Developed', 'Coordinated', 'Automated', 'Analyzed', 'Reduced', 'Increased',
+];
+
+const WEAK_VERB_RE = /^(worked|helped|did|made|handled|responsible|assisted|participated|supported|involved)\b/i;
 
 const tokenize = (text: string): string[] => {
   return (text.toLowerCase().match(/[a-z0-9+#.]{3,}/g) || []).filter(token => !STOP_WORDS.has(token));
@@ -51,6 +58,66 @@ const ATSMatcher: React.FC = () => {
     return parts.join(' ').toLowerCase();
   }, [cvData]);
 
+  const sectionCorpora = useMemo(() => {
+    return {
+      summary: [cvData.personalInfo.title, cvData.personalInfo.summary].join(' ').toLowerCase(),
+      experience: cvData.experiences.flatMap(exp => [exp.position, exp.company, exp.description]).join(' ').toLowerCase(),
+      skills: cvData.skills.map(skill => skill.name).join(' ').toLowerCase(),
+      education: cvData.education.flatMap(edu => [edu.degree, edu.field, edu.institution, edu.description]).join(' ').toLowerCase(),
+    };
+  }, [cvData]);
+
+  const readinessChecks = useMemo(() => {
+    const missingExperienceDates = cvData.experiences.filter(exp => !exp.startDate || (!exp.current && !exp.endDate)).length;
+    const missingEducationDates = cvData.education.filter(edu => !edu.startDate || !edu.endDate).length;
+
+    const bulletLines = cvData.experiences
+      .flatMap(exp => exp.description.split(/\n|\.\s+/g).map(line => line.trim()))
+      .filter(Boolean);
+
+    const tooShortBullets = bulletLines.filter(line => line.length > 0 && line.length < 60).length;
+    const tooLongBullets = bulletLines.filter(line => line.length > 220).length;
+    const weakVerbBullets = bulletLines.filter(line => WEAK_VERB_RE.test(line)).slice(0, 5);
+
+    return {
+      items: [
+        {
+          label: 'Full name and job title added',
+          ok: Boolean(cvData.personalInfo.fullName.trim() && cvData.personalInfo.title.trim()),
+          hint: 'Add your name and a clear target role in Personal Information.',
+        },
+        {
+          label: 'Professional summary written',
+          ok: Boolean(cvData.personalInfo.summary.trim()),
+          hint: 'Add a 2-4 line summary highlighting your value and domain expertise.',
+        },
+        {
+          label: 'At least 2 experience entries',
+          ok: cvData.experiences.length >= 2,
+          hint: 'Recruiters usually expect at least 2 relevant roles or projects.',
+        },
+        {
+          label: 'Experience dates complete',
+          ok: missingExperienceDates === 0,
+          hint: `${missingExperienceDates} experience entr${missingExperienceDates === 1 ? 'y is' : 'ies are'} missing dates.`,
+        },
+        {
+          label: 'Education dates complete',
+          ok: missingEducationDates === 0,
+          hint: `${missingEducationDates} education entr${missingEducationDates === 1 ? 'y is' : 'ies are'} missing dates.`,
+        },
+        {
+          label: 'At least 6 skills listed',
+          ok: cvData.skills.length >= 6,
+          hint: 'Add role-relevant tools, frameworks, and methods.',
+        },
+      ],
+      tooShortBullets,
+      tooLongBullets,
+      weakVerbBullets,
+    };
+  }, [cvData]);
+
   const analysis = useMemo(() => {
     const trimmed = jobDescription.trim();
     if (!trimmed) {
@@ -66,6 +133,7 @@ const ATSMatcher: React.FC = () => {
         coveragePct: 0,
         missingTerms: [] as string[],
         matchedTerms: [] as string[],
+        sectionCoverage: [] as Array<{ label: string; value: number }>,
         insights: ['Add more specific keywords (tools, technologies, responsibilities) in the job description.'],
       };
     }
@@ -96,14 +164,28 @@ const ATSMatcher: React.FC = () => {
       insights.push(`Add missing keywords naturally in your CV: ${missingTerms.slice(0, 6).join(', ')}.`);
     }
 
+    const sectionCoverage = [
+      { label: 'Summary', corpus: sectionCorpora.summary },
+      { label: 'Experience', corpus: sectionCorpora.experience },
+      { label: 'Skills', corpus: sectionCorpora.skills },
+      { label: 'Education', corpus: sectionCorpora.education },
+    ].map(section => {
+      const matched = uniqueTerms.filter(term => section.corpus.includes(term)).length;
+      return {
+        label: section.label,
+        value: Math.round((matched / uniqueTerms.length) * 100),
+      };
+    });
+
     return {
       score,
       coveragePct,
       missingTerms: missingTerms.slice(0, 12),
       matchedTerms: matchedTerms.slice(0, 12),
+      sectionCoverage,
       insights,
     };
-  }, [jobDescription, cvCorpus, cvData]);
+  }, [jobDescription, cvCorpus, cvData, sectionCorpora]);
 
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen}>
@@ -144,6 +226,42 @@ const ATSMatcher: React.FC = () => {
                 <li key={tip}>- {tip}</li>
               ))}
             </ul>
+          </div>
+
+          <div className="rounded-lg border border-border bg-muted/20 p-3 space-y-2">
+            <div className="flex items-center gap-2">
+              <ListChecks className="w-3.5 h-3.5 text-accent" />
+              <p className="text-xs font-medium text-foreground">CV Readiness Checklist</p>
+            </div>
+            <ul className="space-y-1.5">
+              {readinessChecks.items.map((item) => (
+                <li key={item.label} className="text-xs text-muted-foreground flex items-start gap-2">
+                  <span className={`mt-[2px] inline-block w-2 h-2 rounded-full ${item.ok ? 'bg-green-500' : 'bg-amber-500'}`} />
+                  <span>
+                    <span className="text-foreground">{item.label}:</span>{' '}
+                    {item.ok ? 'Looks good.' : item.hint}
+                  </span>
+                </li>
+              ))}
+            </ul>
+
+            <div className="pt-1 space-y-1">
+              <p className="text-xs font-medium text-foreground">Bullet Quality</p>
+              <p className="text-xs text-muted-foreground">
+                Short bullets (&lt;60 chars): {readinessChecks.tooShortBullets} | Long bullets (&gt;220 chars): {readinessChecks.tooLongBullets}
+              </p>
+              {readinessChecks.weakVerbBullets.length > 0 && (
+                <div className="text-xs text-muted-foreground space-y-1">
+                  <p className="flex items-center gap-1.5 text-foreground"><Wand2 className="w-3 h-3" /> Replace weak openers with stronger verbs:</p>
+                  <ul className="space-y-1">
+                    {readinessChecks.weakVerbBullets.map((line, idx) => (
+                      <li key={`${line}-${idx}`}>• "{line.slice(0, 80)}{line.length > 80 ? '...' : ''}"</li>
+                    ))}
+                  </ul>
+                  <p>Try verbs like: {STRONG_VERBS.slice(0, 8).join(', ')}.</p>
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="flex items-center justify-between gap-3">
@@ -218,6 +336,24 @@ const ATSMatcher: React.FC = () => {
                     <li key={idx} className="text-xs text-muted-foreground">• {insight}</li>
                   ))}
                 </ul>
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-xs font-medium text-foreground">
+                  <BarChart3 className="w-3.5 h-3.5 text-accent" />
+                  Keyword Coverage by Section
+                </div>
+                <div className="space-y-2">
+                  {analysis.sectionCoverage.map((section) => (
+                    <div key={section.label} className="space-y-1">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-muted-foreground">{section.label}</span>
+                        <span className="font-medium text-foreground">{section.value}%</span>
+                      </div>
+                      <Progress value={section.value} className="h-1.5" />
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           )}
