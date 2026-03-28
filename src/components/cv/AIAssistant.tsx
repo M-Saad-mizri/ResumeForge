@@ -334,10 +334,10 @@ const AIAssistant: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
     const experienceLine = recentExperience.length > 0
       ? recentExperience
-          .map((exp) => exp.sentence
-            ? `In my ${exp.role} role at ${exp.company}, ${exp.sentence.charAt(0).toLowerCase() + exp.sentence.slice(1)}`
-            : `In my ${exp.role} role at ${exp.company}, I handled responsibilities relevant to ${targetRole}.`)
-          .join(' ')
+        .map((exp) => exp.sentence
+          ? `In my ${exp.role} role at ${exp.company}, ${exp.sentence.charAt(0).toLowerCase() + exp.sentence.slice(1)}`
+          : `In my ${exp.role} role at ${exp.company}, I handled responsibilities relevant to ${targetRole}.`)
+        .join(' ')
       : '';
 
     const opening = `Dear Hiring Manager,\n\nI am writing to express my interest in the ${targetRole} position at ${targetCompany}. ${toneLine}`;
