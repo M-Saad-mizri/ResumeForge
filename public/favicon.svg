@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="ResumeForge icon">
+  <defs>
+    <linearGradient id="resumeforge-gradient" x1="12" y1="8" x2="52" y2="56" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0f766e" />
+      <stop offset="1" stop-color="#1d4ed8" />
+    </linearGradient>
+  </defs>
+  <rect x="6" y="4" width="52" height="56" rx="12" fill="url(#resumeforge-gradient)" />
+  <path d="M22 18h14c5.523 0 10 4.477 10 10 0 4.073-2.435 7.577-5.927 9.146L46 46h-8.289l-4.637-7H30v7h-8V18Zm8 7v8h5c2.209 0 4-1.791 4-4s-1.791-4-4-4h-5Z" fill="#f8fafc" />
+  <path d="M18 50h28" stroke="#bae6fd" stroke-width="4" stroke-linecap="round" opacity="0.85" />
+</svg>

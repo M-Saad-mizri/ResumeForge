@@ -5,6 +5,7 @@ import { useCV } from '@/contexts/CVContext';
 import CVForm from '@/components/cv/CVForm';
 import TemplateSelector from '@/components/cv/TemplateSelector';
 import DesignCustomizer from '@/components/cv/DesignCustomizer';
+import ATSMatcher from '@/components/cv/ATSMatcher';
 import LivePreview from '@/components/cv/LivePreview';
 import ProfileManager from '@/components/cv/ProfileManager';
 import ShareDialog from '@/components/cv/ShareDialog';
@@ -326,6 +327,7 @@ const [qrDialogOpen, setQrDialogOpen] = useState(false);
           <div className="p-4 space-y-4">
             <TemplateSelector />
             <DesignCustomizer />
+            <ATSMatcher />
             <CVForm />
           </div>
         </div>
@@ -347,8 +349,9 @@ const [qrDialogOpen, setQrDialogOpen] = useState(false);
           </DialogHeader>
           <div className="space-y-4 pt-2">
             <div>
-              <label className="text-sm font-medium text-foreground mb-2 block">Upload a file</label>
+              <label htmlFor="cv-import-file" className="text-sm font-medium text-foreground mb-2 block">Upload a file</label>
               <input
+                id="cv-import-file"
                 type="file"
                 ref={fileInputRef}
                 accept=".json"
@@ -362,8 +365,9 @@ const [qrDialogOpen, setQrDialogOpen] = useState(false);
               <div className="h-px flex-1 bg-border" />
             </div>
             <div>
-              <label className="text-sm font-medium text-foreground mb-2 block">Paste JSON text</label>
+              <label htmlFor="cv-import-json-text" className="text-sm font-medium text-foreground mb-2 block">Paste JSON text</label>
               <Textarea
+                id="cv-import-json-text"
                 placeholder='{"cvData": {...}, "template": "modern", ...}'
                 value={importJsonText}
                 onChange={e => setImportJsonText(e.target.value)}
