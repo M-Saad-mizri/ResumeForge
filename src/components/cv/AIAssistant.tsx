@@ -28,6 +28,73 @@ const AI_FEATURES: AIFeature[] = [
 
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
+// Renders AI markdown output (bold, headings, bullet lists) as React elements
+const renderMarkdown = (text: string) => {
+  const lines = text.split('\n');
+  const elements: React.ReactNode[] = [];
+  let listItems: React.ReactNode[] = [];
+  let keyCounter = 0;
+  const k = () => keyCounter++;
+
+  const renderInline = (raw: string) => {
+    const parts: React.ReactNode[] = [];
+    const regex = /\*\*(.+?)\*\*/g;
+    let last = 0, m: RegExpExecArray | null;
+    while ((m = regex.exec(raw)) !== null) {
+      if (m.index > last) parts.push(raw.slice(last, m.index));
+      parts.push(<strong key={k()} className="font-semibold text-foreground">{m[1]}</strong>);
+      last = m.index + m[0].length;
+    }
+    if (last < raw.length) parts.push(raw.slice(last));
+    return parts;
+  };
+
+  const flushList = () => {
+    if (listItems.length > 0) {
+      elements.push(<ul key={k()} className="space-y-1.5 pl-1">{listItems}</ul>);
+      listItems = [];
+    }
+  };
+
+  for (const raw of lines) {
+    const line = raw.trim();
+    if (!line) { flushList(); continue; }
+
+    // Heading: ## or ###
+    if (/^#{1,3}\s/.test(line)) {
+      flushList();
+      const text = line.replace(/^#{1,3}\s/, '');
+      elements.push(<p key={k()} className="font-semibold text-foreground text-sm mt-2">{renderInline(text)}</p>);
+      continue;
+    }
+
+    // Bold-only line (acts as a section heading)
+    if (/^\*\*[^*]+\*\*:?$/.test(line)) {
+      flushList();
+      elements.push(<p key={k()} className="font-semibold text-foreground text-sm mt-2">{renderInline(line.replace(/:$/, ''))}</p>);
+      continue;
+    }
+
+    // Bullet: * or -
+    if (/^[*-]\s+/.test(line)) {
+      const content = line.replace(/^[*-]\s+/, '');
+      listItems.push(
+        <li key={k()} className="flex gap-2 text-sm text-muted-foreground">
+          <span className="mt-1 shrink-0 w-1.5 h-1.5 rounded-full bg-accent/70 inline-block" />
+          <span>{renderInline(content)}</span>
+        </li>
+      );
+      continue;
+    }
+
+    // Plain paragraph
+    flushList();
+    elements.push(<p key={k()} className="text-sm text-muted-foreground leading-relaxed">{renderInline(line)}</p>);
+  }
+  flushList();
+  return elements;
+};
+
 const normalizeExperience = (experience: Partial<Experience>): Experience => ({
   id: generateId(),
   company: experience.company?.trim() || 'Company',
@@ -144,39 +211,76 @@ const AIAssistant: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     }
   };
 
-  const handleAddRelatedExperience = async () => {
-    if (!cvData.personalInfo.title.trim() && cvData.skills.length === 0 && cvData.experiences.length === 0) {
-      toast.error('Add a title, skills, or at least one experience first');
+  const handleAddRelatedExperience = () => {
+    const title = cvData.personalInfo.title.trim();
+    const skills = cvData.skills.slice(0, 5).map(s => s.name).filter(Boolean);
+
+    if (!title && skills.length === 0 && cvData.experiences.length === 0) {
+      toast.error('Add a job title, skills, or at least one experience first');
       return;
     }
 
-    const res = await callAI('add_related_experience', { cvData });
-    if (!res) return;
+    const isSenior = /senior|sr\b|lead|principal|manager|director|head|chief/i.test(title);
+    const baseRole = title
+      .replace(/^(senior|sr\.|lead|principal|junior|jr\.|associate|entry\s+level)\s+/i, '')
+      .trim() || 'Professional';
 
-    try {
-      const cleaned = res.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-      const parsed = JSON.parse(cleaned);
-      const experiences = Array.isArray(parsed)
-        ? parsed
-        : Array.isArray(parsed?.experiences)
-          ? parsed.experiences
-          : [];
+    const skillsStr = skills.length > 0 ? skills.slice(0, 3).join(', ') : 'core industry tools';
+    const currentYear = new Date().getFullYear();
 
-      if (experiences.length === 0) {
-        throw new Error('No experiences were generated');
-      }
+    // Derive industry-contextual company names from the job title
+    const inferCompanyNames = (role: string): [string, string] => {
+      const r = role.toLowerCase();
+      if (/software|developer|engineer|frontend|backend|fullstack|devops|cloud|data|ml|ai/.test(r))
+        return ['Nexova Technologies', 'Brightcode Solutions'];
+      if (/design|ux|ui|product design|graphic|visual/.test(r))
+        return ['Pixel & Co.', 'Forma Creative Studio'];
+      if (/market|seo|content|brand|social media|growth|digital/.test(r))
+        return ['Momentum Marketing', 'Spark Digital Agency'];
+      if (/finance|account|audit|tax|banking|analyst/.test(r))
+        return ['Meridian Financial Group', 'Clearview Consulting'];
+      if (/doctor|nurse|healthcare|medical|clinical|pharma|health/.test(r))
+        return ['Vitalcare Health Systems', 'MedBridge Clinic'];
+      if (/teach|educat|instructor|professor|trainer|curriculum/.test(r))
+        return ['Horizon Academy', 'EduPath Institute'];
+      if (/sales|business develop|account exec|client/.test(r))
+        return ['Pinnacle Sales Group', 'Venture Connect Ltd.'];
+      if (/project manager|scrum|agile|program manager|product manager/.test(r))
+        return ['Stratex Consulting', 'Agile Works Inc.'];
+      if (/lawyer|legal|counsel|paralegal|attorney/.test(r))
+        return ['Harlow & Partners LLP', 'Cornerstone Legal Group'];
+      // fallback: generic but professional
+      return ['Apex Innovations Ltd.', 'Crestline Group'];
+    };
 
-      const newExperiences = experiences.slice(0, 2).map(normalizeExperience);
-      setCVData({
-        ...cvData,
-        experiences: [...cvData.experiences, ...newExperiences],
-      });
-      toast.success(`${newExperiences.length} related sample experiences added!`);
-      setResult(null);
-      setActiveFeature(null);
-    } catch {
-      setResult('Failed to parse AI response. Here\'s the raw output:\n\n' + res);
-    }
+    const [company1, company2] = inferCompanyNames(baseRole);
+
+    const sample1: Experience = {
+      id: generateId(),
+      company: company1,
+      position: isSenior ? baseRole : `Senior ${baseRole}`,
+      startDate: `${currentYear - 5}-03`,
+      endDate: `${currentYear - 2}-08`,
+      current: false,
+      description: `Led key projects using ${skillsStr}. Collaborated with cross-functional teams to deliver results on time and within scope. Mentored junior colleagues and drove continuous process improvements.`,
+    };
+
+    const sample2: Experience = {
+      id: generateId(),
+      company: company2,
+      position: `Junior ${baseRole}`,
+      startDate: `${currentYear - 8}-06`,
+      endDate: `${currentYear - 5}-02`,
+      current: false,
+      description: `Supported team initiatives and applied ${skillsStr} to day-to-day challenges. Assisted in delivery of client-facing work and maintained technical documentation.`,
+    };
+
+    setCVData({
+      ...cvData,
+      experiences: [...cvData.experiences, sample1, sample2],
+    });
+    toast.success('2 related sample experiences added — edit them to match your background!');
+    setActiveFeature(null);
   };
 
   const renderFeatureForm = () => {
@@ -238,14 +342,13 @@ const AIAssistant: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         return (
           <div className="space-y-3">
             <div className="rounded-lg bg-muted/50 p-3 text-sm text-muted-foreground space-y-2">
-              <p>AI will read your current CV title, summary, skills, and existing experience.</p>
-              <p>It will then add 2 related sample experiences directly into your experience section.</p>
+              <p>Reads your current CV title and skills, then adds 2 contextually related sample experiences to your experience section.</p>
+              <p className="text-xs">Edit the added entries to match your actual background.</p>
             </div>
-            <Button onClick={handleAddRelatedExperience} disabled={loading} className="w-full btn-gold border-0 gap-2">
-              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <PlusCircle className="w-4 h-4" />}
+            <Button onClick={handleAddRelatedExperience} className="w-full btn-gold border-0 gap-2">
+              <PlusCircle className="w-4 h-4" />
               Add 2 Related Experiences
             </Button>
-            {result && <div className="p-3 rounded-lg bg-muted/50 text-sm whitespace-pre-wrap">{result}</div>}
           </div>
         );
 
@@ -269,7 +372,11 @@ const AIAssistant: React.FC<{ onClose: () => void }> = ({ onClose }) => {
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <MessageSquare className="w-4 h-4" />}
               Review My CV
             </Button>
-            {result && <div className="p-3 rounded-lg bg-muted/50 text-sm whitespace-pre-wrap">{result}</div>}
+            {result && (
+              <div className="rounded-lg border border-border bg-muted/30 p-4 space-y-2">
+                {renderMarkdown(result)}
+              </div>
+            )}
           </div>
         );
 

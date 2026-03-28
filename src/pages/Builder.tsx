@@ -29,7 +29,7 @@ const Builder = () => {
   const [showPreview, setShowPreview] = useState(false);
   const [saveName, setSaveName] = useState('');
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
-const [qrDialogOpen, setQrDialogOpen] = useState(false);
+  const [qrDialogOpen, setQrDialogOpen] = useState(false);
   const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [importJsonText, setImportJsonText] = useState('');
   const [showAI, setShowAI] = useState(false);
