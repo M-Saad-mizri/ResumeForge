@@ -63,6 +63,7 @@ const migrateDesignSettings = (settings: any): DesignSettings => ({
 
 export const CVProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth();
+  const cloudDb = supabase as any;
 
   const [profiles, setProfiles] = useState<CVProfile[]>(() => {
     try {
