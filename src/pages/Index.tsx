@@ -1,4 +1,5 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 import { FileText, Sparkles, Download, Layout, Shield, Zap, Image, Share2, Upload, Palette, Save, Database, Eye, Layers, ArrowRight, LogIn, UserPlus } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
@@ -49,6 +50,22 @@ const WorkflowStep = ({ index, icon: Icon, title, description, steps }: {
 
 const Index = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
+
+  // If Supabase redirects auth errors (e.g. expired reset link) to root,
+  // forward them to /reset-password which already handles the error hash
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (hash && hash.includes('error=') && hash.includes('recovery')) {
+      navigate('/reset-password' + hash, { replace: true });
+      return;
+    }
+    // Also handle when error_code contains otp_expired (password reset context)
+    if (hash && hash.includes('error=') && hash.includes('otp_expired')) {
+      navigate('/reset-password' + hash, { replace: true });
+    }
+  }, [navigate]);
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}

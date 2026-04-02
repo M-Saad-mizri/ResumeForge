@@ -45,8 +45,11 @@ const ResetPassword = () => {
         });
 
         const timeout = window.setTimeout(() => {
-            setLinkError('Reset link is invalid or expired. Please request a new password reset email.');
-        }, 5000);
+            // Don't set error if hash already contained an error (already shown)
+            if (!linkError) {
+                setLinkError('Reset link is invalid or expired. Please request a new password reset email.');
+            }
+        }, 8000);
 
         return () => {
             subscription.unsubscribe();
