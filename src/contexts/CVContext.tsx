@@ -345,7 +345,7 @@ export const CVProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     setActiveProfileId(id);
     // Immediate cloud upsert on explicit save
     if (user) {
-      supabase.from('cv_profiles').upsert({
+      cloudDb.from('cv_profiles').upsert({
         id: profile.id,
         user_id: user.id,
         name: profile.name,
@@ -376,7 +376,7 @@ export const CVProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     }
     // Delete from cloud
     if (user) {
-      supabase.from('cv_profiles').delete().eq('id', id).eq('user_id', user.id);
+      cloudDb.from('cv_profiles').delete().eq('id', id).eq('user_id', user.id);
     }
   };
 
