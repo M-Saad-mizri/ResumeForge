@@ -1,4 +1,5 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 import { FileText, Sparkles, Download, Layout, Shield, Zap, Image, Share2, Upload, Palette, Save, Database, Eye, Layers, ArrowRight, LogIn, UserPlus } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
