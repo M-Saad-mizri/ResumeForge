@@ -1,7 +1,8 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
-import { FileText, Download, Save, ChevronLeft, Eye, Edit3, Image, Upload, Share2, Link2, MoreVertical, Sparkles, FileDown, Linkedin, Loader2 } from 'lucide-react';
+import { Link, useSearchParams, useNavigate } from 'react-router-dom';
+import { FileText, Download, Save, ChevronLeft, Eye, Edit3, Image, Upload, Share2, Link2, MoreVertical, Sparkles, FileDown, Linkedin, Loader2, LogOut } from 'lucide-react';
 import { useCV } from '@/contexts/CVContext';
+import { useAuth } from '@/contexts/AuthContext';
 import CVForm from '@/components/cv/CVForm';
 import TemplateSelector from '@/components/cv/TemplateSelector';
 import DesignCustomizer from '@/components/cv/DesignCustomizer';
@@ -24,6 +25,8 @@ import { supabase } from '@/integrations/supabase/client';
 
 const Builder = () => {
   const { saveProfile, activeProfile, cvData, template, designSettings, setCVData, setTemplate } = useCV();
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
   const printRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [showPreview, setShowPreview] = useState(false);
@@ -433,6 +436,16 @@ const Builder = () => {
               <DropdownMenuItem onClick={() => handlePrint()} className="gap-2 cursor-pointer sm:hidden">
                 <Download className="w-4 h-4" />
                 Export PDF
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              {/* Account */}
+              <p className="px-2 py-1.5 text-xs text-muted-foreground truncate">{user?.email}</p>
+              <DropdownMenuItem
+                onClick={async () => { await signOut(); navigate('/'); }}
+                className="gap-2 cursor-pointer text-destructive focus:text-destructive"
+              >
+                <LogOut className="w-4 h-4" />
+                Sign Out
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      cv_profiles: {
+        Row: {
+          id: string
+          user_id: string
+          name: string
+          cv_data: Json
+          template: string
+          design_settings: Json
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          name: string
+          cv_data: Json
+          template: string
+          design_settings: Json
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          name?: string
+          cv_data?: Json
+          template?: string
+          design_settings?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
       shared_cvs: {
         Row: {
           created_at: string

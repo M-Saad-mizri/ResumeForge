@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
-import { FileText, Sparkles, Download, Layout, Shield, Zap, Image, Share2, Upload, Palette, Save, Database, Eye, Layers, ArrowRight } from 'lucide-react';
+import { FileText, Sparkles, Download, Layout, Shield, Zap, Image, Share2, Upload, Palette, Save, Database, Eye, Layers, ArrowRight, LogIn, UserPlus } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useAuth } from '@/contexts/AuthContext';
 
 const features = [
   { icon: Layout, title: 'Multiple Templates', desc: 'Choose from Modern, Classic, and ATS-friendly templates' },
@@ -47,6 +48,7 @@ const WorkflowStep = ({ index, icon: Icon, title, description, steps }: {
 );
 
 const Index = () => {
+  const { user } = useAuth();
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -58,12 +60,30 @@ const Index = () => {
             </div>
             <span className="font-display text-xl font-bold text-foreground">ResumeForge</span>
           </Link>
-          <Link
-            to="/builder"
-            className="btn-gold rounded-lg text-sm"
-          >
-            Start Building
-          </Link>
+          <div className="flex items-center gap-2">
+            {user ? (
+              <Link to="/builder" className="btn-gold rounded-lg text-sm">
+                Go to Builder
+              </Link>
+            ) : (
+              <>
+                <Link
+                  to="/auth"
+                  className="px-4 py-2 rounded-lg text-sm font-medium text-foreground hover:bg-accent/10 transition-colors inline-flex items-center gap-1.5"
+                >
+                  <LogIn className="w-4 h-4" />
+                  Sign In
+                </Link>
+                <Link
+                  to="/auth"
+                  className="btn-gold rounded-lg text-sm inline-flex items-center gap-1.5"
+                >
+                  <UserPlus className="w-4 h-4" />
+                  Sign Up
+                </Link>
+              </>
+            )}
+          </div>
         </div>
       </header>
 
