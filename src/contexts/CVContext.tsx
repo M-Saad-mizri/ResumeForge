@@ -63,7 +63,6 @@ const migrateDesignSettings = (settings: any): DesignSettings => ({
 
 export const CVProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth();
-  const cloudDb = supabase as any;
 
   const [profiles, setProfiles] = useState<CVProfile[]>(() => {
     try {
@@ -85,15 +84,15 @@ export const CVProvider: React.FC<{ children: React.ReactNode }> = ({ children }
   // Debounce timer ref for cloud sync
   const syncTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // ── Cloud sync: load profiles from backend when user signs in ──
+  // ── Cloud sync: load profiles from Supabase when user signs in ──
   useEffect(() => {
     if (!user) return;
-    cloudDb
+    supabase
       .from('cv_profiles')
       .select('*')
       .eq('user_id', user.id)
       .order('updated_at', { ascending: false })
-      .then(({ data, error }: { data: any[] | null; error: any }) => {
+      .then(({ data, error }) => {
         if (error || !data) return;
         const cloudProfiles: CVProfile[] = data.map((row: any) => ({
           id: row.id,
@@ -104,12 +103,13 @@ export const CVProvider: React.FC<{ children: React.ReactNode }> = ({ children }
           updatedAt: row.updated_at,
         }));
         setProfiles(cloudProfiles);
+        // If there was an active profile id that exists in the cloud, keep it
         setActiveProfileId(prev => {
           if (prev && cloudProfiles.find(p => p.id === prev)) return prev;
           return cloudProfiles[0]?.id ?? null;
         });
       });
-  }, [cloudDb, user]);
+  }, [user?.id]);
 
   // Load active profile's data into editor state
   useEffect(() => {
@@ -157,10 +157,10 @@ export const CVProvider: React.FC<{ children: React.ReactNode }> = ({ children }
         design_settings: p.designSettings as any,
         updated_at: p.updatedAt,
       }));
-      await cloudDb.from('cv_profiles').upsert(rows, { onConflict: 'id' });
+      await supabase.from('cv_profiles').upsert(rows, { onConflict: 'id' });
     }, 1500);
     return () => { if (syncTimerRef.current) clearTimeout(syncTimerRef.current); };
-  }, [cloudDb, profiles, user]);
+  }, [profiles, user?.id]);
 
   const setCVData = (data: CVData) => setCVDataState(data);
 
@@ -345,7 +345,7 @@ export const CVProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     setActiveProfileId(id);
     // Immediate cloud upsert on explicit save
     if (user) {
-      cloudDb.from('cv_profiles').upsert({
+      supabase.from('cv_profiles').upsert({
         id: profile.id,
         user_id: user.id,
         name: profile.name,
@@ -376,7 +376,7 @@ export const CVProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     }
     // Delete from cloud
     if (user) {
-      cloudDb.from('cv_profiles').delete().eq('id', id).eq('user_id', user.id);
+      supabase.from('cv_profiles').delete().eq('id', id).eq('user_id', user.id);
     }
   };
 
