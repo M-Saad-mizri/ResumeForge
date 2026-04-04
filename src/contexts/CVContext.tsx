@@ -334,7 +334,7 @@ export const CVProvider: React.FC<{ children: React.ReactNode }> = ({ children }
   };
 
   const saveProfile = (name: string) => {
-    const id = activeProfileId || generateId();
+    const id = activeProfileId || crypto.randomUUID();
     const profile: CVProfile = {
       id, name, data: cvData, template, designSettings, updatedAt: new Date().toISOString(),
     };
