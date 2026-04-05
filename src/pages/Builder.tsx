@@ -332,6 +332,7 @@ const Builder = () => {
             <span className="font-display text-lg font-bold text-foreground hidden sm:inline">ResumeForge</span>
           </Link>
           <SyncStatusBadge />
+        </div>
 
         <div className="flex items-center gap-2">
           <Button
