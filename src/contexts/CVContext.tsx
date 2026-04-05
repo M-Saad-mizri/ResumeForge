@@ -83,6 +83,7 @@ export const CVProvider: React.FC<{ children: React.ReactNode }> = ({ children }
   const [cvData, setCVDataState] = useState<CVData>(defaultCVData);
   const [template, setTemplateState] = useState<TemplateType>('modern');
   const [designSettings, setDesignSettings] = useState<DesignSettings>(defaultDesignSettings);
+  const [syncStatus, setSyncStatus] = useState<SyncStatus>('idle');
 
   // Debounce timer ref for cloud sync
   const syncTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
