@@ -4,12 +4,15 @@ import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 
 const features = [
-  { icon: Layout, title: 'Multiple Templates', desc: 'Choose from Modern, Classic, and ATS-friendly templates' },
-  { icon: Sparkles, title: 'AI-Powered', desc: 'Get smart content suggestions to enhance your CV' },
-  { icon: Download, title: 'PDF Export', desc: 'Download your CV as a professional PDF document' },
-  { icon: Shield, title: 'ATS Optimized', desc: 'Templates designed to pass Applicant Tracking Systems' },
-  { icon: Zap, title: 'Quick Editing', desc: 'Edit sections inline with real-time preview' },
-  { icon: FileText, title: 'Save Profiles', desc: 'Save multiple CV profiles for different job applications' },
+  { icon: Layout, title: 'Multiple Templates', desc: '6 professional templates: Modern, Classic, Minimal, Creative, Executive & ATS-Optimized' },
+  { icon: Sparkles, title: 'AI-Powered Writing', desc: 'AI writes descriptions, summaries, skill suggestions & full CV generation from rough text' },
+  { icon: Cloud, title: 'Cloud Sync', desc: 'Sign in to sync your profiles across devices — or use offline with local storage' },
+  { icon: Linkedin, title: 'LinkedIn Import', desc: 'Paste your LinkedIn profile and AI structures it into a complete CV instantly' },
+  { icon: FileDown, title: 'Multi-Format Export', desc: 'Export as PDF, HD Image, ATS Text, Markdown, or JSON for maximum portability' },
+  { icon: Shield, title: 'ATS Optimized', desc: 'Templates and exports designed to pass Applicant Tracking Systems' },
+  { icon: Share2, title: 'Share via Link', desc: 'Generate a shareable link valid for 30 days — recipients can view and import your CV' },
+  { icon: Save, title: 'Multiple Profiles', desc: 'Save different CV versions for different applications with auto-save' },
+  { icon: Palette, title: 'Design Customizer', desc: 'Fine-tune colors, fonts, spacing, and page width to make your CV unique' },
 ];
 
 const WorkflowStep = ({ index, icon: Icon, title, description, steps }: {
