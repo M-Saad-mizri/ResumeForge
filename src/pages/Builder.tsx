@@ -439,15 +439,25 @@ const Builder = () => {
                 Export PDF
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              {/* Account */}
-              <p className="px-2 py-1.5 text-xs text-muted-foreground truncate">{user?.email}</p>
-              <DropdownMenuItem
-                onClick={async () => { await signOut(); navigate('/'); }}
-                className="gap-2 cursor-pointer text-destructive focus:text-destructive"
-              >
-                <LogOut className="w-4 h-4" />
-                Sign Out
-              </DropdownMenuItem>
+              {user ? (
+                <>
+                  <p className="px-2 py-1.5 text-xs text-muted-foreground truncate">{user.email}</p>
+                  <DropdownMenuItem
+                    onClick={async () => { await signOut(); navigate('/'); }}
+                    className="gap-2 cursor-pointer text-destructive focus:text-destructive"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Sign Out
+                  </DropdownMenuItem>
+                </>
+              ) : (
+                <DropdownMenuItem asChild className="gap-2 cursor-pointer">
+                  <Link to="/auth">
+                    <LogIn className="w-4 h-4" />
+                    Sign In for Cloud Sync
+                  </Link>
+                </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
 
