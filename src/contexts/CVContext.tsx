@@ -3,7 +3,10 @@ import { CVData, CVProfile, TemplateType, defaultCVData, sampleCVData, SectionId
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 
+export type SyncStatus = 'idle' | 'syncing' | 'synced' | 'error';
+
 interface CVContextType {
+  syncStatus: SyncStatus;
   profiles: CVProfile[];
   activeProfileId: string | null;
   activeProfile: CVProfile | null;
