@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { FileText, Sparkles, Download, Layout, Shield, Zap, Image, Share2, Upload, Palette, Save, Database, Eye, Layers, ArrowRight, LogIn, UserPlus } from 'lucide-react';
+import { FileText, Sparkles, Download, Layout, Shield, Zap, Image, Share2, Upload, Palette, Save, Database, Eye, Layers, ArrowRight, LogIn, UserPlus, Linkedin, Cloud, FileDown, PenLine } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 
