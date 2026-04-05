@@ -46,7 +46,7 @@ const ResetPassword = () => {
 
         const timeout = window.setTimeout(() => {
             setLinkError('Reset link is invalid or expired. Please request a new password reset email.');
-        }, 5000);
+        }, 30 * 60 * 1000);
 
         return () => {
             subscription.unsubscribe();
