@@ -220,9 +220,17 @@ const Index = () => {
               description="Generate a unique shareable link to your CV with one click. Anyone with the link can view and import your CV into their own builder — no account needed. Links are valid for 30 days."
               steps={['Open "More" menu → "Share via Link"', 'Click "Generate Share Link" to create a unique URL', 'Copy and send the link to anyone', 'Recipients can instantly load your CV and start editing']} />
 
-            <WorkflowStep index={10} icon={Sparkles} title="AI-Powered Assistant"
-              description="Use built-in AI to supercharge your CV. Generate professional summaries, craft job descriptions, get skill suggestions, receive optimization tips, or paste rough text and let AI structure it into a complete CV."
-              steps={['Rough Text → CV: Paste unstructured info and AI builds your entire CV', 'Summary Generator: Create a polished professional summary from your experience', 'Job Description Writer: Generate impactful bullet points for any role', 'Skill Suggestions: Get relevant skills recommended based on your experience', 'CV Review & Tips: Receive actionable feedback to improve your CV']} />
+            <WorkflowStep index={10} icon={Linkedin} title="LinkedIn Import"
+              description="Paste your LinkedIn profile text and let AI parse it into a structured CV. No file upload needed — just copy, paste, and go."
+              steps={['Open "More" menu → "Import from LinkedIn"', 'Copy all text from your LinkedIn profile page', 'Paste into the import dialog', 'AI extracts and structures your experience, education, and skills']} />
+
+            <WorkflowStep index={11} icon={PenLine} title="AI Writing Assistant"
+              description="Let AI write experience descriptions for you. Click the sparkle icon next to any experience entry, or use the AI panel for summaries, skills, and full CV generation."
+              steps={['Click the ✨ icon next to any experience description field', 'AI generates a professional description based on your role and company', 'Use the AI panel for summaries, skill suggestions, and CV tips', 'Paste rough text and AI builds your entire CV from scratch']} />
+
+            <WorkflowStep index={12} icon={Cloud} title="Cloud Sync"
+              description="Sign in to automatically sync your CV profiles to the cloud. Access your CVs from any device, anytime. Guest users work fully offline with local storage."
+              steps={['Create a free account or sign in', 'Your profiles sync automatically as you edit', 'A status badge shows Local Only, Syncing, or Cloud Synced', 'Works offline too — data is always saved locally as backup']} />
           </div>
         </div>
       </section>
