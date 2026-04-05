@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
-import { FileText, Download, Save, ChevronLeft, Eye, Edit3, Image, Upload, Share2, Link2, MoreVertical, Sparkles, FileDown, Linkedin, Loader2, LogOut } from 'lucide-react';
+import { FileText, Download, Save, ChevronLeft, Eye, Edit3, Image, Upload, Share2, Link2, MoreVertical, Sparkles, FileDown, Linkedin, Loader2, LogOut, LogIn } from 'lucide-react';
 import { useCV } from '@/contexts/CVContext';
 import { useAuth } from '@/contexts/AuthContext';
 import CVForm from '@/components/cv/CVForm';
@@ -10,6 +10,7 @@ import ATSMatcher from '@/components/cv/ATSMatcher';
 import LivePreview from '@/components/cv/LivePreview';
 import ProfileManager from '@/components/cv/ProfileManager';
 import ShareDialog from '@/components/cv/ShareDialog';
+import SyncStatusBadge from '@/components/cv/SyncStatusBadge';
 import AIAssistant from '@/components/cv/AIAssistant';
 import { useReactToPrint } from 'react-to-print';
 import html2canvas from 'html2canvas';
@@ -330,6 +331,7 @@ const Builder = () => {
             </div>
             <span className="font-display text-lg font-bold text-foreground hidden sm:inline">ResumeForge</span>
           </Link>
+          <SyncStatusBadge />
         </div>
 
         <div className="flex items-center gap-2">
@@ -438,15 +440,25 @@ const Builder = () => {
                 Export PDF
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              {/* Account */}
-              <p className="px-2 py-1.5 text-xs text-muted-foreground truncate">{user?.email}</p>
-              <DropdownMenuItem
-                onClick={async () => { await signOut(); navigate('/'); }}
-                className="gap-2 cursor-pointer text-destructive focus:text-destructive"
-              >
-                <LogOut className="w-4 h-4" />
-                Sign Out
-              </DropdownMenuItem>
+              {user ? (
+                <>
+                  <p className="px-2 py-1.5 text-xs text-muted-foreground truncate">{user.email}</p>
+                  <DropdownMenuItem
+                    onClick={async () => { await signOut(); navigate('/'); }}
+                    className="gap-2 cursor-pointer text-destructive focus:text-destructive"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Sign Out
+                  </DropdownMenuItem>
+                </>
+              ) : (
+                <DropdownMenuItem asChild className="gap-2 cursor-pointer">
+                  <Link to="/auth">
+                    <LogIn className="w-4 h-4" />
+                    Sign In for Cloud Sync
+                  </Link>
+                </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
 

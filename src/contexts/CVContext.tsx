@@ -3,7 +3,10 @@ import { CVData, CVProfile, TemplateType, defaultCVData, sampleCVData, SectionId
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 
+export type SyncStatus = 'idle' | 'syncing' | 'synced' | 'error';
+
 interface CVContextType {
+  syncStatus: SyncStatus;
   profiles: CVProfile[];
   activeProfileId: string | null;
   activeProfile: CVProfile | null;
@@ -80,6 +83,7 @@ export const CVProvider: React.FC<{ children: React.ReactNode }> = ({ children }
   const [cvData, setCVDataState] = useState<CVData>(defaultCVData);
   const [template, setTemplateState] = useState<TemplateType>('modern');
   const [designSettings, setDesignSettings] = useState<DesignSettings>(defaultDesignSettings);
+  const [syncStatus, setSyncStatus] = useState<SyncStatus>('idle');
 
   // Debounce timer ref for cloud sync
   const syncTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -147,17 +151,23 @@ export const CVProvider: React.FC<{ children: React.ReactNode }> = ({ children }
   useEffect(() => {
     if (!user || profiles.length === 0) return;
     if (syncTimerRef.current) clearTimeout(syncTimerRef.current);
+    setSyncStatus('syncing');
     syncTimerRef.current = setTimeout(async () => {
-      const rows = profiles.map(p => ({
-        id: p.id,
-        user_id: user.id,
-        name: p.name,
-        cv_data: p.data as any,
-        template: p.template,
-        design_settings: p.designSettings as any,
-        updated_at: p.updatedAt,
-      }));
-      await supabase.from('cv_profiles').upsert(rows, { onConflict: 'id' });
+      try {
+        const rows = profiles.map(p => ({
+          id: p.id,
+          user_id: user.id,
+          name: p.name,
+          cv_data: p.data as any,
+          template: p.template,
+          design_settings: p.designSettings as any,
+          updated_at: p.updatedAt,
+        }));
+        const { error } = await supabase.from('cv_profiles').upsert(rows, { onConflict: 'id' });
+        setSyncStatus(error ? 'error' : 'synced');
+      } catch {
+        setSyncStatus('error');
+      }
     }, 1500);
     return () => { if (syncTimerRef.current) clearTimeout(syncTimerRef.current); };
   }, [profiles, user?.id]);
@@ -395,7 +405,7 @@ export const CVProvider: React.FC<{ children: React.ReactNode }> = ({ children }
 
   return (
     <CVContext.Provider value={{
-      profiles, activeProfileId, activeProfile, cvData, template, designSettings,
+      profiles, activeProfileId, activeProfile, cvData, template, designSettings, syncStatus,
       setCVData, updatePersonalInfo, setTemplate,
       addExperience, updateExperience, removeExperience,
       addEducation, updateEducation, removeEducation,
