@@ -72,17 +72,10 @@ const Index = () => {
               <>
                 <Link
                   to="/auth"
-                  className="px-4 py-2 rounded-lg text-sm font-medium text-foreground hover:bg-accent/10 transition-colors inline-flex items-center gap-1.5"
+                  className="btn-gold rounded-lg text-sm inline-flex items-center gap-1.5"
                 >
                   <LogIn className="w-4 h-4" />
                   Sign In
-                </Link>
-                <Link
-                  to="/auth"
-                  className="btn-gold rounded-lg text-sm inline-flex items-center gap-1.5"
-                >
-                  <UserPlus className="w-4 h-4" />
-                  Sign Up
                 </Link>
               </>
             )}
