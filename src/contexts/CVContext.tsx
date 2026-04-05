@@ -405,7 +405,7 @@ export const CVProvider: React.FC<{ children: React.ReactNode }> = ({ children }
 
   return (
     <CVContext.Provider value={{
-      profiles, activeProfileId, activeProfile, cvData, template, designSettings,
+      profiles, activeProfileId, activeProfile, cvData, template, designSettings, syncStatus,
       setCVData, updatePersonalInfo, setTemplate,
       addExperience, updateExperience, removeExperience,
       addEducation, updateEducation, removeEducation,
