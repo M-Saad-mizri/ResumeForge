@@ -10,6 +10,7 @@ import ATSMatcher from '@/components/cv/ATSMatcher';
 import LivePreview from '@/components/cv/LivePreview';
 import ProfileManager from '@/components/cv/ProfileManager';
 import ShareDialog from '@/components/cv/ShareDialog';
+import SyncStatusBadge from '@/components/cv/SyncStatusBadge';
 import AIAssistant from '@/components/cv/AIAssistant';
 import { useReactToPrint } from 'react-to-print';
 import html2canvas from 'html2canvas';
