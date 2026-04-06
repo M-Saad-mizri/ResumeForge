@@ -391,7 +391,17 @@ export const CVProvider: React.FC<{ children: React.ReactNode }> = ({ children }
   };
 
   const createNewProfile = () => {
-    setActiveProfileId(null);
+    const id = crypto.randomUUID();
+    const profile: CVProfile = {
+      id,
+      name: `Untitled CV ${profiles.length + 1}`,
+      data: defaultCVData,
+      template: 'modern',
+      designSettings: defaultDesignSettings,
+      updatedAt: new Date().toISOString(),
+    };
+    setProfiles(prev => [...prev, profile]);
+    setActiveProfileId(id);
     setCVDataState(defaultCVData);
     setTemplateState('modern');
     setDesignSettings(defaultDesignSettings);
