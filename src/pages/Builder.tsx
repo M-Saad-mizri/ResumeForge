@@ -456,41 +456,10 @@ const Builder = () => {
 
             <ProfileManager />
 
-            <Dialog open={saveDialogOpen} onOpenChange={setSaveDialogOpen}>
-              <DialogTrigger asChild>
-                <Button variant="outline" size="sm" className="gap-1.5">
-                  <Save className="w-4 h-4" />
-                  Save
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Save CV Profile</DialogTitle>
-                </DialogHeader>
-                <div className="space-y-4 pt-2">
-                  {!user && (
-                    <div className="bg-muted/50 border border-border rounded-lg p-3 text-sm space-y-2">
-                      <p className="text-muted-foreground">
-                        You're in <span className="font-semibold text-foreground">guest mode</span>. Your profile will be saved locally on this device only.
-                      </p>
-                      <Link to="/auth" className="inline-flex items-center gap-1.5 text-accent hover:underline text-sm font-medium">
-                        <LogIn className="w-3.5 h-3.5" />
-                        Sign in to save to cloud
-                      </Link>
-                    </div>
-                  )}
-                  <Input
-                    placeholder="Profile name (e.g., Tech Resume)"
-                    value={saveName}
-                    onChange={e => setSaveName(e.target.value)}
-                    onKeyDown={e => e.key === 'Enter' && handleSave()}
-                  />
-                  <Button onClick={handleSave} className="w-full btn-gold border-0">
-                    {user ? 'Save Profile' : 'Save Locally'}
-                  </Button>
-                </div>
-              </DialogContent>
-            </Dialog>
+            <Button variant="outline" size="sm" className="gap-1.5" onClick={() => setSaveDialogOpen(true)}>
+              <Save className="w-4 h-4" />
+              Save
+            </Button>
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
