@@ -355,6 +355,8 @@ const Builder = () => {
               {showPreview ? <Edit3 className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </Button>
 
+            <ProfileManager />
+
             <Button
               variant="ghost"
               size="icon"

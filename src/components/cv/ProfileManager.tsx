@@ -10,7 +10,7 @@ const ProfileManager = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm" className="gap-1.5">
+        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground sm:h-9 sm:w-auto sm:px-3 sm:gap-1.5 sm:variant-outline">
           <FolderOpen className="w-4 h-4" />
           <span className="hidden sm:inline max-w-[120px] truncate">
             {activeProfile?.name || 'Profiles'}
