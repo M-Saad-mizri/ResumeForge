@@ -3,9 +3,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useCV } from '@/contexts/CVContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { Link2, Copy, Check, Loader2, Share2 } from 'lucide-react';
+import { Link2, Copy, Check, Loader2, Share2, LogIn } from 'lucide-react';
 import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 
 interface ShareDialogProps {
   open: boolean;
@@ -14,11 +16,14 @@ interface ShareDialogProps {
 
 const ShareDialog: React.FC<ShareDialogProps> = ({ open, onOpenChange }) => {
   const { cvData, template, designSettings } = useCV();
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [shareUrl, setShareUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
 
   const handleShare = async () => {
+    if (!user) return;
     setLoading(true);
     try {
       const { data, error } = await supabase
@@ -27,6 +32,7 @@ const ShareDialog: React.FC<ShareDialogProps> = ({ open, onOpenChange }) => {
           cv_data: cvData as any,
           template,
           design_settings: designSettings as any,
+          user_id: user.id,
         })
         .select('id')
         .single();
@@ -72,7 +78,17 @@ const ShareDialog: React.FC<ShareDialogProps> = ({ open, onOpenChange }) => {
         </DialogHeader>
 
         <div className="flex flex-col gap-4 py-4">
-          {!shareUrl ? (
+          {!user ? (
+            <div className="text-center space-y-3">
+              <p className="text-sm text-muted-foreground">
+                Sign in to create shareable links for your CV.
+              </p>
+              <Button onClick={() => { onOpenChange(false); navigate('/auth'); }} className="btn-gold border-0 gap-2">
+                <LogIn className="w-4 h-4" />
+                Sign In to Share
+              </Button>
+            </div>
+          ) : !shareUrl ? (
             <Button onClick={handleShare} disabled={loading} className="w-full btn-gold border-0 gap-2">
               {loading ? (
                 <>
