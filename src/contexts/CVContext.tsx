@@ -40,6 +40,7 @@ interface CVContextType {
   saveProfile: (name: string) => void;
   loadProfile: (id: string) => void;
   deleteProfile: (id: string) => void;
+  renameProfile: (id: string, newName: string) => void;
   createNewProfile: () => void;
   loadSampleData: () => void;
 }
@@ -388,6 +389,10 @@ export const CVProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     if (user) {
       supabase.from('cv_profiles').delete().eq('id', id).eq('user_id', user.id);
     }
+  };
+
+  const renameProfile = (id: string, newName: string) => {
+    setProfiles(prev => prev.map(p => p.id === id ? { ...p, name: newName, updatedAt: new Date().toISOString() } : p));
   };
 
   const createNewProfile = () => {
