@@ -156,7 +156,13 @@ export const CVProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     setSyncStatus('syncing');
     syncTimerRef.current = setTimeout(async () => {
       try {
-        const rows = profiles.map(p => ({
+        // Filter out recently deleted profiles to avoid re-inserting them
+        const activeProfiles = profiles.filter(p => !deletedIdsRef.current.has(p.id));
+        if (activeProfiles.length === 0) {
+          setSyncStatus('synced');
+          return;
+        }
+        const rows = activeProfiles.map(p => ({
           id: p.id,
           user_id: user.id,
           name: p.name,
@@ -166,6 +172,9 @@ export const CVProvider: React.FC<{ children: React.ReactNode }> = ({ children }
           updated_at: p.updatedAt,
         }));
         const { error } = await supabase.from('cv_profiles').upsert(rows, { onConflict: 'id' });
+        setSyncStatus(error ? 'error' : 'synced');
+        // Clear deleted IDs after successful sync
+        deletedIdsRef.current.clear();
         setSyncStatus(error ? 'error' : 'synced');
       } catch {
         setSyncStatus('error');
