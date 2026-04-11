@@ -88,6 +88,7 @@ export const CVProvider: React.FC<{ children: React.ReactNode }> = ({ children }
 
   // Debounce timer ref for cloud sync
   const syncTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const deletedIdsRef = useRef<Set<string>>(new Set());
 
   // ── Cloud sync: load profiles from Supabase when user signs in ──
   useEffect(() => {
@@ -378,16 +379,22 @@ export const CVProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     }
   };
 
-  const deleteProfile = (id: string) => {
+  const deleteProfile = async (id: string) => {
+    // Mark as deleted so the sync upsert skips it
+    deletedIdsRef.current.add(id);
     setProfiles(prev => prev.filter(p => p.id !== id));
     if (activeProfileId === id) {
       setActiveProfileId(null);
       setCVDataState(defaultCVData);
       setDesignSettings(defaultDesignSettings);
     }
-    // Delete from cloud
+    // Delete from cloud first
     if (user) {
-      supabase.from('cv_profiles').delete().eq('id', id).eq('user_id', user.id);
+      try {
+        await supabase.from('cv_profiles').delete().eq('id', id).eq('user_id', user.id);
+      } catch (e) {
+        console.error('Failed to delete profile from cloud', e);
+      }
     }
   };
 
