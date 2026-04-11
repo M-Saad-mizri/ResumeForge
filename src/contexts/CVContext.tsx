@@ -429,7 +429,7 @@ export const CVProvider: React.FC<{ children: React.ReactNode }> = ({ children }
       addCustomSection, updateCustomSectionTitle, removeCustomSection,
       addCustomSectionItem, updateCustomSectionItem, removeCustomSectionItem,
       reorderSections, updateDesignSetting, resetDesignSettings,
-      saveProfile, loadProfile, deleteProfile, createNewProfile, loadSampleData,
+      saveProfile, loadProfile, deleteProfile, renameProfile, createNewProfile, loadSampleData,
     }}>
       {children}
     </CVContext.Provider>
