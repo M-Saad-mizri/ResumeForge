@@ -40,6 +40,7 @@ interface CVContextType {
   saveProfile: (name: string) => void;
   loadProfile: (id: string) => void;
   deleteProfile: (id: string) => void;
+  renameProfile: (id: string, newName: string) => void;
   createNewProfile: () => void;
   loadSampleData: () => void;
 }
@@ -390,6 +391,10 @@ export const CVProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     }
   };
 
+  const renameProfile = (id: string, newName: string) => {
+    setProfiles(prev => prev.map(p => p.id === id ? { ...p, name: newName, updatedAt: new Date().toISOString() } : p));
+  };
+
   const createNewProfile = () => {
     const id = crypto.randomUUID();
     const profile: CVProfile = {
@@ -424,7 +429,7 @@ export const CVProvider: React.FC<{ children: React.ReactNode }> = ({ children }
       addCustomSection, updateCustomSectionTitle, removeCustomSection,
       addCustomSectionItem, updateCustomSectionItem, removeCustomSectionItem,
       reorderSections, updateDesignSetting, resetDesignSettings,
-      saveProfile, loadProfile, deleteProfile, createNewProfile, loadSampleData,
+      saveProfile, loadProfile, deleteProfile, renameProfile, createNewProfile, loadSampleData,
     }}>
       {children}
     </CVContext.Provider>
