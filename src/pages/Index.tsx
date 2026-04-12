@@ -86,7 +86,7 @@ const Index = () => {
       </header>
 
       {/* Hero */}
-      <section className="gradient-hero pt-32 pb-24 px-6">
+      <section className="gradient-hero pt-32 pb-24 px-6" aria-label="Hero">
         <div className="container mx-auto text-center">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -125,7 +125,7 @@ const Index = () => {
       </section>
 
       {/* Features */}
-      <section className="py-24 px-6">
+      <section className="py-24 px-6" aria-label="Features">
         <div className="container mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -162,7 +162,7 @@ const Index = () => {
       </section>
 
       {/* How It Works */}
-      <section className="py-24 px-6 bg-muted/30">
+      <section className="py-24 px-6 bg-muted/30" aria-label="How it works">
         <div className="container mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
