@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
+import SEO from '@/components/SEO';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { FileText, Download, Save, ChevronLeft, Eye, Edit3, Image, Upload, Share2, Link2, MoreVertical, Sparkles, FileDown, Linkedin, Loader2, LogOut, LogIn } from 'lucide-react';
 import { useCV } from '@/contexts/CVContext';
@@ -321,6 +322,11 @@ const Builder = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <SEO
+        title="CV Builder – Edit & Export Your Resume"
+        description="Use the ResumeForge builder to create, edit, and export your professional CV with AI assistance, multiple templates, and real-time preview."
+        canonical="/builder"
+      />
       {/* Top Bar */}
       <header className="bg-card border-b border-border no-print sticky top-0 z-50">
         {/* Mobile header */}

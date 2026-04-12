@@ -14,6 +14,7 @@
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#1a1a2e" />
 
+  <!-- Open Graph (fallback — overridden per page by react-helmet-async) -->
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://getcv.lovable.app/" />
   <meta property="og:image" content="https://getcv.lovable.app/favicon.svg" />
@@ -22,12 +23,14 @@
     content="Build a professional CV in minutes with ResumeForge — free AI-powered resume builder with 6 templates, ATS optimization, and PDF export." />
   <meta property="og:site_name" content="ResumeForge" />
 
+  <!-- Twitter Card (fallback) -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:image" content="https://getcv.lovable.app/favicon.svg" />
   <meta name="twitter:title" content="Free AI CV Builder – Create Professional Resumes | ResumeForge" />
   <meta name="twitter:description"
     content="Build a professional CV in minutes with ResumeForge — free AI-powered resume builder with 6 templates, ATS optimization, and PDF export." />
 
+  <!-- Structured Data -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -47,6 +50,48 @@
       "@type": "Organization",
       "name": "ResumeForge"
     }
+  }
+  </script>
+
+  <!-- FAQ Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Is ResumeForge completely free?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, ResumeForge is 100% free. You can create, edit, and export your CV as PDF, image, or other formats without paying anything."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does ResumeForge support ATS-friendly resumes?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, ResumeForge includes an ATS-optimized template and ATS text export to ensure your resume passes Applicant Tracking Systems used by employers."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I import my LinkedIn profile?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, you can paste your LinkedIn profile text and the AI will automatically structure it into a complete, professional CV."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Do I need to create an account?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No, you can use ResumeForge without an account. Your data is saved locally. Create a free account to sync across devices."
+        }
+      }
+    ]
   }
   </script>
 </head>

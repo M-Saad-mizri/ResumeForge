@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import SEO from '@/components/SEO';
 import { Link, useNavigate } from 'react-router-dom';
 import { FileText, Loader2, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -68,6 +69,11 @@ const Auth = () => {
 
     return (
         <div className="min-h-screen bg-background flex flex-col">
+            <SEO
+              title="Sign In or Create Account"
+              description="Sign in or create a free ResumeForge account to sync your CVs across devices, access cloud storage, and never lose your work."
+              canonical="/auth"
+            />
             {/* Header */}
             <header className="px-6 py-4 border-b border-border">
                 <Link to="/" className="inline-flex items-center gap-2">

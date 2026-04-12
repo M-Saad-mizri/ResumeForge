@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import SEO from '@/components/SEO';
 import { Link, useNavigate } from 'react-router-dom';
 import { FileText, Loader2, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -77,6 +78,7 @@ const ResetPassword = () => {
 
     return (
         <div className="min-h-screen bg-background flex flex-col">
+            <SEO title="Reset Password" description="Set a new password for your ResumeForge account." noindex />
             <header className="px-6 py-4 border-b border-border">
                 <Link to="/" className="inline-flex items-center gap-2">
                     <div className="w-8 h-8 rounded-lg gradient-gold flex items-center justify-center">

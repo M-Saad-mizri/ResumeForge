@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import SEO from '@/components/SEO';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useCV } from '@/contexts/CVContext';
@@ -49,6 +50,7 @@ const SharedCV = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
+        <SEO title="Loading Shared CV" noindex />
         <div className="text-center space-y-4">
           <Loader2 className="w-8 h-8 animate-spin mx-auto text-primary" />
           <p className="text-muted-foreground">Loading shared CV...</p>
