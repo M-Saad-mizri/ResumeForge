@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { FileText, Sparkles, Download, Layout, Shield, Zap, Image, Share2, Upload, Palette, Save, Database, Eye, Layers, ArrowRight, LogIn, UserPlus, Linkedin, Cloud, FileDown, PenLine } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
+import SEO from '@/components/SEO';
 
 const features = [
   { icon: Layout, title: 'Multiple Templates', desc: '6 professional templates: Modern, Classic, Minimal, Creative, Executive & ATS-Optimized' },
@@ -54,6 +55,7 @@ const Index = () => {
   const { user } = useAuth();
   return (
     <div className="min-h-screen bg-background" role="main">
+      <SEO canonical="/" />
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
         <div className="container mx-auto px-6 py-4 flex items-center justify-between">

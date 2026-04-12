@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import SEO from '@/components/SEO';
 import { Link, useNavigate } from 'react-router-dom';
 import { FileText, Loader2, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';

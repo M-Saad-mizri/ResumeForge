@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
+import SEO from '@/components/SEO';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { FileText, Download, Save, ChevronLeft, Eye, Edit3, Image, Upload, Share2, Link2, MoreVertical, Sparkles, FileDown, Linkedin, Loader2, LogOut, LogIn } from 'lucide-react';
 import { useCV } from '@/contexts/CVContext';
