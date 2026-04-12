@@ -322,6 +322,11 @@ const Builder = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <SEO
+        title="CV Builder – Edit & Export Your Resume"
+        description="Use the ResumeForge builder to create, edit, and export your professional CV with AI assistance, multiple templates, and real-time preview."
+        canonical="/builder"
+      />
       {/* Top Bar */}
       <header className="bg-card border-b border-border no-print sticky top-0 z-50">
         {/* Mobile header */}
