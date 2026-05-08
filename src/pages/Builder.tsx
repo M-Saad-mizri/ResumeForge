@@ -772,10 +772,12 @@ const Builder = () => {
           <DialogHeader>
             <DialogTitle>Preview PDF</DialogTitle>
           </DialogHeader>
-          <div className="flex-1 min-h-0 bg-muted rounded-md overflow-hidden">
-            {pdfPreviewUrl && (
+          <div className="flex-1 min-h-0 bg-muted rounded-md overflow-auto">
+            {pdfPreviewImage ? (
+              <img src={pdfPreviewImage} alt="PDF Preview" className="w-full h-auto block" />
+            ) : pdfPreviewUrl ? (
               <iframe src={pdfPreviewUrl} title="PDF Preview" className="w-full h-full border-0" />
-            )}
+            ) : null}
           </div>
           <div className="flex gap-2 justify-end">
             <Button variant="outline" onClick={closePdfPreview}>Cancel</Button>
