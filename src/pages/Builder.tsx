@@ -43,6 +43,10 @@ const Builder = () => {
   const [linkedinText, setLinkedinText] = useState('');
   const [linkedinLoading, setLinkedinLoading] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
+  const [pdfPreviewOpen, setPdfPreviewOpen] = useState(false);
+  const [pdfPreviewUrl, setPdfPreviewUrl] = useState<string | null>(null);
+  const [pdfBlob, setPdfBlob] = useState<Blob | null>(null);
+  const [pdfGenerating, setPdfGenerating] = useState(false);
 
   // Auto-import from QR code URL
   useEffect(() => {
@@ -73,18 +77,9 @@ const Builder = () => {
   const isMobile = typeof navigator !== 'undefined' && /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
 
   const handleExportPDF = async () => {
-    if (!printRef.current) {
-      reactPrint();
-      return;
-    }
-    // On mobile (especially Android), the browser print dialog often captures
-    // the whole page instead of just the CV. Generate a real PDF instead.
-    if (!isMobile) {
-      reactPrint();
-      return;
-    }
+    if (!printRef.current) return;
+    setPdfGenerating(true);
     try {
-      toast.loading('Generating PDF...');
       const canvas = await html2canvas(printRef.current, {
         scale: 2,
         useCORS: true,
@@ -106,13 +101,37 @@ const Builder = () => {
         pdf.addImage(imgData, 'PNG', 0, position, pageWidth, imgHeight);
         heightLeft -= pageHeight;
       }
-      pdf.save(`${activeProfile?.name || 'My CV'}.pdf`);
-      toast.dismiss();
-      toast.success('PDF exported!');
+      const blob = pdf.output('blob');
+      if (pdfPreviewUrl) URL.revokeObjectURL(pdfPreviewUrl);
+      const url = URL.createObjectURL(blob);
+      setPdfBlob(blob);
+      setPdfPreviewUrl(url);
+      setPdfPreviewOpen(true);
     } catch (e) {
-      toast.dismiss();
-      toast.error('Failed to export PDF');
+      toast.error('Failed to generate PDF');
+    } finally {
+      setPdfGenerating(false);
     }
+  };
+
+  const handleConfirmDownloadPDF = () => {
+    if (!pdfBlob) return;
+    const link = document.createElement('a');
+    link.download = `${activeProfile?.name || 'My CV'}.pdf`;
+    link.href = URL.createObjectURL(pdfBlob);
+    link.click();
+    URL.revokeObjectURL(link.href);
+    toast.success('PDF downloaded!');
+    closePdfPreview();
+  };
+
+  const closePdfPreview = () => {
+    setPdfPreviewOpen(false);
+    if (pdfPreviewUrl) {
+      URL.revokeObjectURL(pdfPreviewUrl);
+      setPdfPreviewUrl(null);
+    }
+    setPdfBlob(null);
   };
 
   const handlePrint = () => { handleExportPDF(); };
@@ -739,6 +758,27 @@ const Builder = () => {
                   Import with AI
                 </>
               )}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* PDF Preview Dialog */}
+      <Dialog open={pdfPreviewOpen} onOpenChange={(open) => { if (!open) closePdfPreview(); }}>
+        <DialogContent className="max-w-4xl w-[95vw] h-[90vh] flex flex-col p-4 gap-3">
+          <DialogHeader>
+            <DialogTitle>Preview PDF</DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 min-h-0 bg-muted rounded-md overflow-hidden">
+            {pdfPreviewUrl && (
+              <iframe src={pdfPreviewUrl} title="PDF Preview" className="w-full h-full border-0" />
+            )}
+          </div>
+          <div className="flex gap-2 justify-end">
+            <Button variant="outline" onClick={closePdfPreview}>Cancel</Button>
+            <Button className="btn-gold border-0" onClick={handleConfirmDownloadPDF}>
+              <Download className="w-4 h-4 mr-2" />
+              Download PDF
             </Button>
           </div>
         </DialogContent>
