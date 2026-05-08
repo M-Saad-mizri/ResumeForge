@@ -46,6 +46,7 @@ const Builder = () => {
   const [pdfPreviewOpen, setPdfPreviewOpen] = useState(false);
   const [pdfPreviewUrl, setPdfPreviewUrl] = useState<string | null>(null);
   const [pdfBlob, setPdfBlob] = useState<Blob | null>(null);
+  const [pdfPreviewImage, setPdfPreviewImage] = useState<string | null>(null);
   const [pdfGenerating, setPdfGenerating] = useState(false);
 
   // Auto-import from QR code URL
@@ -106,6 +107,7 @@ const Builder = () => {
       const url = URL.createObjectURL(blob);
       setPdfBlob(blob);
       setPdfPreviewUrl(url);
+      setPdfPreviewImage(imgData);
       setPdfPreviewOpen(true);
     } catch (e) {
       toast.error('Failed to generate PDF');
@@ -132,6 +134,7 @@ const Builder = () => {
       setPdfPreviewUrl(null);
     }
     setPdfBlob(null);
+    setPdfPreviewImage(null);
   };
 
   const handlePrint = () => { handleExportPDF(); };
@@ -769,10 +772,12 @@ const Builder = () => {
           <DialogHeader>
             <DialogTitle>Preview PDF</DialogTitle>
           </DialogHeader>
-          <div className="flex-1 min-h-0 bg-muted rounded-md overflow-hidden">
-            {pdfPreviewUrl && (
+          <div className="flex-1 min-h-0 bg-muted rounded-md overflow-auto">
+            {pdfPreviewImage ? (
+              <img src={pdfPreviewImage} alt="PDF Preview" className="w-full h-auto block" />
+            ) : pdfPreviewUrl ? (
               <iframe src={pdfPreviewUrl} title="PDF Preview" className="w-full h-full border-0" />
-            )}
+            ) : null}
           </div>
           <div className="flex gap-2 justify-end">
             <Button variant="outline" onClick={closePdfPreview}>Cancel</Button>
