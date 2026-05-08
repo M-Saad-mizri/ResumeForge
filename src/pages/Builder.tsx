@@ -15,6 +15,7 @@ import SyncStatusBadge from '@/components/cv/SyncStatusBadge';
 import AIAssistant from '@/components/cv/AIAssistant';
 import { useReactToPrint } from 'react-to-print';
 import html2canvas from 'html2canvas';
+import { jsPDF } from 'jspdf';
 import { decompressFromEncodedURIComponent } from 'lz-string';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -64,10 +65,57 @@ const Builder = () => {
     }
   }, []);
 
-  const handlePrint = useReactToPrint({
+  const reactPrint = useReactToPrint({
     contentRef: printRef,
     documentTitle: activeProfile?.name || 'My CV',
   });
+
+  const isMobile = typeof navigator !== 'undefined' && /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+
+  const handleExportPDF = async () => {
+    if (!printRef.current) {
+      reactPrint();
+      return;
+    }
+    // On mobile (especially Android), the browser print dialog often captures
+    // the whole page instead of just the CV. Generate a real PDF instead.
+    if (!isMobile) {
+      reactPrint();
+      return;
+    }
+    try {
+      toast.loading('Generating PDF...');
+      const canvas = await html2canvas(printRef.current, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: '#ffffff',
+        logging: false,
+      });
+      const imgData = canvas.toDataURL('image/png', 1.0);
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pageWidth = 210;
+      const pageHeight = 297;
+      const imgHeight = (canvas.height * pageWidth) / canvas.width;
+      let heightLeft = imgHeight;
+      let position = 0;
+      pdf.addImage(imgData, 'PNG', 0, position, pageWidth, imgHeight);
+      heightLeft -= pageHeight;
+      while (heightLeft > 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, position, pageWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+      pdf.save(`${activeProfile?.name || 'My CV'}.pdf`);
+      toast.dismiss();
+      toast.success('PDF exported!');
+    } catch (e) {
+      toast.dismiss();
+      toast.error('Failed to export PDF');
+    }
+  };
+
+  const handlePrint = () => { handleExportPDF(); };
 
   const handleExportImage = async () => {
     if (!printRef.current) return;
