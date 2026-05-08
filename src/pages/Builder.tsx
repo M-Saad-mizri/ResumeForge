@@ -762,6 +762,27 @@ const Builder = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* PDF Preview Dialog */}
+      <Dialog open={pdfPreviewOpen} onOpenChange={(open) => { if (!open) closePdfPreview(); }}>
+        <DialogContent className="max-w-4xl w-[95vw] h-[90vh] flex flex-col p-4 gap-3">
+          <DialogHeader>
+            <DialogTitle>Preview PDF</DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 min-h-0 bg-muted rounded-md overflow-hidden">
+            {pdfPreviewUrl && (
+              <iframe src={pdfPreviewUrl} title="PDF Preview" className="w-full h-full border-0" />
+            )}
+          </div>
+          <div className="flex gap-2 justify-end">
+            <Button variant="outline" onClick={closePdfPreview}>Cancel</Button>
+            <Button className="btn-gold border-0" onClick={handleConfirmDownloadPDF}>
+              <Download className="w-4 h-4 mr-2" />
+              Download PDF
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
