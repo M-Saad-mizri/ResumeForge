@@ -46,6 +46,7 @@ const Builder = () => {
   const [pdfPreviewOpen, setPdfPreviewOpen] = useState(false);
   const [pdfPreviewUrl, setPdfPreviewUrl] = useState<string | null>(null);
   const [pdfBlob, setPdfBlob] = useState<Blob | null>(null);
+  const [pdfPreviewImage, setPdfPreviewImage] = useState<string | null>(null);
   const [pdfGenerating, setPdfGenerating] = useState(false);
 
   // Auto-import from QR code URL
@@ -106,6 +107,7 @@ const Builder = () => {
       const url = URL.createObjectURL(blob);
       setPdfBlob(blob);
       setPdfPreviewUrl(url);
+      setPdfPreviewImage(imgData);
       setPdfPreviewOpen(true);
     } catch (e) {
       toast.error('Failed to generate PDF');
@@ -132,6 +134,7 @@ const Builder = () => {
       setPdfPreviewUrl(null);
     }
     setPdfBlob(null);
+    setPdfPreviewImage(null);
   };
 
   const handlePrint = () => { handleExportPDF(); };
