@@ -1,5 +1,4 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -56,55 +55,7 @@ serve(async (req) => {
   }
 
   try {
-    // Require authentication
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader?.startsWith("Bearer ")) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-    const supabaseAuth = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_ANON_KEY")!,
-    );
-    const token = authHeader.replace("Bearer ", "");
-    const { data: userData, error: authError } = await supabaseAuth.auth.getUser(token);
-    if (authError || !userData?.user) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
     const { action, payload } = await req.json();
-
-    // Payload size limits to prevent abuse / token drain
-    const MAX_TEXT = 10_000;
-    const MAX_JSON = 50_000;
-    const tooLarge = (msg: string) =>
-      new Response(JSON.stringify({ error: msg }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    if (payload?.text && typeof payload.text === "string" && payload.text.length > MAX_TEXT) {
-      return tooLarge("Input text too large (max 10,000 characters)");
-    }
-    if (payload?.experience && typeof payload.experience === "string" && payload.experience.length > MAX_TEXT) {
-      return tooLarge("Experience text too large");
-    }
-    if (payload?.context && typeof payload.context === "string" && payload.context.length > MAX_TEXT) {
-      return tooLarge("Context too large");
-    }
-    if (payload?.cvData) {
-      try {
-        if (JSON.stringify(payload.cvData).length > MAX_JSON) {
-          return tooLarge("CV data too large (max 50,000 characters)");
-        }
-      } catch {
-        return tooLarge("Invalid CV data");
-      }
-    }
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
