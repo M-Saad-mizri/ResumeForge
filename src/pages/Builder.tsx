@@ -80,12 +80,20 @@ const Builder = () => {
   const handleExportPDF = async () => {
     if (!printRef.current) return;
     setPdfGenerating(true);
+    const el = printRef.current;
+    const prevTransform = el.style.transform;
+    const prevTransformOrigin = el.style.transformOrigin;
+    // Reset the preview's 0.5 scale so html2canvas captures at full A4 size (sharp output)
+    el.style.transform = 'none';
+    el.style.transformOrigin = 'top left';
     try {
-      const canvas = await html2canvas(printRef.current, {
+      const canvas = await html2canvas(el, {
         scale: 2,
         useCORS: true,
         backgroundColor: '#ffffff',
         logging: false,
+        windowWidth: el.scrollWidth,
+        windowHeight: el.scrollHeight,
       });
       const imgData = canvas.toDataURL('image/png', 1.0);
       const pdf = new jsPDF('p', 'mm', 'a4');
@@ -112,6 +120,8 @@ const Builder = () => {
     } catch (e) {
       toast.error('Failed to generate PDF');
     } finally {
+      el.style.transform = prevTransform;
+      el.style.transformOrigin = prevTransformOrigin;
       setPdfGenerating(false);
     }
   };
@@ -141,13 +151,20 @@ const Builder = () => {
 
   const handleExportImage = async () => {
     if (!printRef.current) return;
+    const el = printRef.current;
+    const prevTransform = el.style.transform;
+    const prevTransformOrigin = el.style.transformOrigin;
+    el.style.transform = 'none';
+    el.style.transformOrigin = 'top left';
     try {
       toast.loading('Generating HD image...');
-      const canvas = await html2canvas(printRef.current, {
+      const canvas = await html2canvas(el, {
         scale: 3,
         useCORS: true,
         backgroundColor: '#ffffff',
         logging: false,
+        windowWidth: el.scrollWidth,
+        windowHeight: el.scrollHeight,
       });
       const link = document.createElement('a');
       link.download = `${activeProfile?.name || 'My CV'}.png`;
@@ -158,6 +175,9 @@ const Builder = () => {
     } catch {
       toast.dismiss();
       toast.error('Failed to export image');
+    } finally {
+      el.style.transform = prevTransform;
+      el.style.transformOrigin = prevTransformOrigin;
     }
   };
 
