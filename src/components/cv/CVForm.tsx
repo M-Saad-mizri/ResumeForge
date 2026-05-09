@@ -9,6 +9,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Slider } from '@/components/ui/slider';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useAuth } from '@/contexts/AuthContext';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
@@ -88,10 +89,15 @@ const CVForm = () => {
     reorderSections,
     loadSampleData,
   } = useCV();
+  const { user } = useAuth();
 
   const [aiLoadingId, setAiLoadingId] = useState<string | null>(null);
 
   const generateDescription = async (expId: string, position: string, company: string) => {
+    if (!user) {
+      toast.error('Login to use AI features');
+      return;
+    }
     if (!position.trim() && !company.trim()) {
       toast.error('Enter a position or company name first');
       return;
