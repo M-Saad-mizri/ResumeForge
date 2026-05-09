@@ -337,6 +337,10 @@ const Builder = () => {
   };
 
   const handleLinkedinImport = async () => {
+    if (!user) {
+      toast.error('Login to use AI features');
+      return;
+    }
     if (!linkedinText.trim()) {
       toast.error('Please paste your LinkedIn profile text first.');
       return;
