@@ -4,6 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { useCV } from '@/contexts/CVContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { Link } from 'react-router-dom';
+import { LogIn } from 'lucide-react';
 import { CVData, Experience } from '@/types/cv';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -108,6 +111,7 @@ const normalizeExperience = (experience: Partial<Experience>): Experience => ({
 
 const AIAssistant: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const { cvData, setCVData, updatePersonalInfo } = useCV();
+  const { user } = useAuth();
   const [activeFeature, setActiveFeature] = useState<AIAction | null>(null);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<string | null>(null);
@@ -533,7 +537,25 @@ const AIAssistant: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         </button>
       </div>
 
-      {!activeFeature ? (
+      {!user ? (
+        <div className="rounded-lg border border-accent/30 bg-accent/5 p-4 text-center space-y-3">
+          <div className="w-10 h-10 mx-auto rounded-full bg-accent/10 flex items-center justify-center">
+            <Sparkles className="w-5 h-5 text-accent" />
+          </div>
+          <div className="space-y-1">
+            <p className="text-sm font-semibold text-foreground">Login to use AI features</p>
+            <p className="text-xs text-muted-foreground">
+              AI tools are available to signed-in users only. Sign in or create a free account to continue.
+            </p>
+          </div>
+          <Link to="/auth" className="inline-block w-full">
+            <Button className="w-full btn-gold border-0 gap-2">
+              <LogIn className="w-4 h-4" />
+              Sign in to continue
+            </Button>
+          </Link>
+        </div>
+      ) : !activeFeature ? (
         <div className="space-y-2">
           {AI_FEATURES.map(feature => (
             <button
