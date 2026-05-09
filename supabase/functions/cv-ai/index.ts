@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -55,6 +56,28 @@ serve(async (req) => {
   }
 
   try {
+    // Auth guard
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const supabaseClient = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+      { global: { headers: { Authorization: authHeader } } }
+    );
+    const token = authHeader.replace("Bearer ", "");
+    const { data: claimsData, error: authError } = await supabaseClient.auth.getClaims(token);
+    if (authError || !claimsData?.claims) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const { action, payload } = await req.json();
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
@@ -66,6 +89,32 @@ serve(async (req) => {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
+    }
+
+    // Size validation to prevent abuse / credit exhaustion
+    const MAX_TEXT = 10_000;
+    const MAX_FIELD = 5_000;
+    const MAX_JSON = 50_000;
+    const tooLarge = (msg: string) =>
+      new Response(JSON.stringify({ error: msg }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+
+    if (action === "parse_rough_text" && (payload?.text?.length ?? 0) > MAX_TEXT) {
+      return tooLarge("Input too long (max 10,000 chars)");
+    }
+    if (
+      (action === "review_cv" || action === "add_related_experience") &&
+      JSON.stringify(payload?.cvData ?? {}).length > MAX_JSON
+    ) {
+      return tooLarge("CV data too large (max 50,000 chars)");
+    }
+    if (action === "generate_summary" && (payload?.experience?.length ?? 0) > MAX_FIELD) {
+      return tooLarge("Experience text too long (max 5,000 chars)");
+    }
+    if (action === "generate_description" && (payload?.context?.length ?? 0) > MAX_FIELD) {
+      return tooLarge("Context too long (max 5,000 chars)");
     }
 
     let userMessage = "";
