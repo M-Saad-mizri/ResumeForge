@@ -78,7 +78,7 @@ const ResetPassword = () => {
 
     return (
         <div className="min-h-screen bg-background flex flex-col">
-            <SEO title="Reset Password" description="Set a new password for your ResumeForge account." noindex />
+            <SEO title="Reset Password" description="Set a new password for your ResumeForge account to regain access to your saved CV profiles and cloud-synced data." noindex />
             <header className="px-6 py-4 border-b border-border">
                 <Link to="/" className="inline-flex items-center gap-2">
                     <div className="w-8 h-8 rounded-lg gradient-gold flex items-center justify-center">
@@ -129,6 +129,7 @@ const ResetPassword = () => {
                                             className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                                             onClick={() => setShowPassword(v => !v)}
                                             tabIndex={-1}
+                                            aria-label={showPassword ? 'Hide password' : 'Show password'}
                                         >
                                             {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                                         </button>

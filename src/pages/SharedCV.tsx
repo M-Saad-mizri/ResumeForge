@@ -52,6 +52,7 @@ const SharedCV = () => {
       <div className="min-h-screen flex items-center justify-center bg-background">
         <SEO title="Loading Shared CV" noindex />
         <div className="text-center space-y-4">
+          <h1 className="sr-only">Loading Shared CV</h1>
           <Loader2 className="w-8 h-8 animate-spin mx-auto text-primary" />
           <p className="text-muted-foreground">Loading shared CV...</p>
         </div>

@@ -379,6 +379,7 @@ const Builder = () => {
         description="Use the ResumeForge builder to create, edit, and export your professional CV with AI assistance, multiple templates, and real-time preview."
         canonical="/builder"
       />
+      <h1 className="sr-only">CV Builder</h1>
       {/* Top Bar */}
       <header className="bg-card border-b border-border no-print sticky top-0 z-50">
         {/* Mobile header */}
@@ -400,6 +401,7 @@ const Builder = () => {
               size="icon"
               className={`h-8 w-8 ${showAI ? 'text-gold bg-gold/10' : 'text-muted-foreground'}`}
               onClick={() => setShowAI(!showAI)}
+              aria-label="Toggle AI assistant"
             >
               <Sparkles className="w-4 h-4" />
             </Button>
@@ -409,6 +411,7 @@ const Builder = () => {
               size="icon"
               className="h-8 w-8 text-muted-foreground"
               onClick={() => setShowPreview(!showPreview)}
+              aria-label={showPreview ? 'Switch to edit mode' : 'Switch to preview mode'}
             >
               {showPreview ? <Edit3 className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </Button>
@@ -420,13 +423,14 @@ const Builder = () => {
               size="icon"
               className="h-8 w-8 text-muted-foreground"
               onClick={() => setSaveDialogOpen(true)}
+              aria-label="Save CV profile"
             >
               <Save className="w-4 h-4" />
             </Button>
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground">
+                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground" aria-label="More options">
                   <MoreVertical className="w-4 h-4" />
                 </Button>
               </DropdownMenuTrigger>
