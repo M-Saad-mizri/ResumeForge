@@ -300,7 +300,7 @@ const CVForm = () => {
                 className="font-semibold"
                 placeholder="Section Title"
               />
-              <button onClick={() => removeCustomSection(section.id)} className="text-muted-foreground hover:text-destructive transition-colors p-1">
+              <button onClick={() => removeCustomSection(section.id)} aria-label="Remove custom section" className="text-muted-foreground hover:text-destructive transition-colors p-1">
                 <Trash2 className="w-4 h-4" />
               </button>
             </div>
