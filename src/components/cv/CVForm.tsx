@@ -35,7 +35,7 @@ const SortableSection: React.FC<{ id: string; children: React.ReactNode }> = ({ 
   return (
     <div ref={setNodeRef} style={style} className="card-elevated px-4 rounded-lg">
       <div className="flex items-center gap-2 py-3 border-b border-border/50">
-        <button {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground touch-none">
+        <button {...attributes} {...listeners} aria-label="Drag to reorder section" className="cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground touch-none">
           <GripVertical className="w-4 h-4" />
         </button>
         <div className="flex-1">{children}</div>
@@ -61,7 +61,7 @@ const PhotoUpload: React.FC<{ photo?: string; onUpload: (dataUrl: string) => voi
           {photo ? <AvatarImage src={photo} alt="Profile" /> : <AvatarFallback><Camera className="w-5 h-5 text-muted-foreground" /></AvatarFallback>}
         </Avatar>
         {photo && (
-          <button onClick={onRemove} className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center">
+          <button onClick={onRemove} aria-label="Remove photo" className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center">
             <X className="w-3 h-3" />
           </button>
         )}
@@ -174,7 +174,7 @@ const CVForm = () => {
           <div className="space-y-4 py-3">
             {cvData.experiences.map(exp => (
               <div key={exp.id} className="space-y-2 p-3 rounded-lg bg-muted/50 relative">
-                <button onClick={() => removeExperience(exp.id)} className="absolute top-2 right-2 text-muted-foreground hover:text-destructive transition-colors">
+                <button onClick={() => removeExperience(exp.id)} aria-label="Remove experience" className="absolute top-2 right-2 text-muted-foreground hover:text-destructive transition-colors">
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
                 <Input placeholder="Position" value={exp.position} onChange={e => updateExperience(exp.id, 'position', e.target.value)} />
@@ -195,6 +195,7 @@ const CVForm = () => {
                         <button
                           onClick={() => generateDescription(exp.id, exp.position, exp.company)}
                           disabled={aiLoadingId === exp.id}
+                          aria-label="AI write description"
                           className="absolute top-2 right-2 p-1 rounded-md text-accent hover:bg-accent/10 transition-colors disabled:opacity-50"
                         >
                           {aiLoadingId === exp.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Wand2 className="w-4 h-4" />}
@@ -217,7 +218,7 @@ const CVForm = () => {
           <div className="space-y-4 py-3">
             {cvData.education.map(edu => (
               <div key={edu.id} className="space-y-2 p-3 rounded-lg bg-muted/50 relative">
-                <button onClick={() => removeEducation(edu.id)} className="absolute top-2 right-2 text-muted-foreground hover:text-destructive transition-colors">
+                <button onClick={() => removeEducation(edu.id)} aria-label="Remove education" className="absolute top-2 right-2 text-muted-foreground hover:text-destructive transition-colors">
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
                 <Input placeholder="Institution" value={edu.institution} onChange={e => updateEducation(edu.id, 'institution', e.target.value)} />
@@ -245,7 +246,7 @@ const CVForm = () => {
                 <Input placeholder="Skill name" value={skill.name} onChange={e => updateSkill(skill.id, 'name', e.target.value)} className="flex-1" />
                 <Slider value={[skill.level]} onValueChange={v => updateSkill(skill.id, 'level', v[0])} min={1} max={5} step={1} className="w-24" />
                 <span className="text-xs text-muted-foreground w-4">{skill.level}</span>
-                <button onClick={() => removeSkill(skill.id)} className="text-muted-foreground hover:text-destructive transition-colors">
+                <button onClick={() => removeSkill(skill.id)} aria-label="Remove skill" className="text-muted-foreground hover:text-destructive transition-colors">
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
               </div>
@@ -265,6 +266,7 @@ const CVForm = () => {
                 <select
                   value={lang.proficiency}
                   onChange={e => updateLanguage(lang.id, 'proficiency', e.target.value)}
+                  aria-label="Language proficiency"
                   className="px-3 py-2 rounded-md border border-input bg-background text-sm"
                 >
                   <option>Beginner</option>
@@ -274,7 +276,7 @@ const CVForm = () => {
                   <option>Fluent</option>
                   <option>Native</option>
                 </select>
-                <button onClick={() => removeLanguage(lang.id)} className="text-muted-foreground hover:text-destructive transition-colors">
+                <button onClick={() => removeLanguage(lang.id)} aria-label="Remove language" className="text-muted-foreground hover:text-destructive transition-colors">
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
               </div>
@@ -298,13 +300,13 @@ const CVForm = () => {
                 className="font-semibold"
                 placeholder="Section Title"
               />
-              <button onClick={() => removeCustomSection(section.id)} className="text-muted-foreground hover:text-destructive transition-colors p-1">
+              <button onClick={() => removeCustomSection(section.id)} aria-label="Remove custom section" className="text-muted-foreground hover:text-destructive transition-colors p-1">
                 <Trash2 className="w-4 h-4" />
               </button>
             </div>
             {section.items.map(item => (
               <div key={item.id} className="space-y-2 p-3 rounded-lg bg-muted/50 relative">
-                <button onClick={() => removeCustomSectionItem(section.id, item.id)} className="absolute top-2 right-2 text-muted-foreground hover:text-destructive transition-colors">
+                <button onClick={() => removeCustomSectionItem(section.id, item.id)} aria-label="Remove item" className="absolute top-2 right-2 text-muted-foreground hover:text-destructive transition-colors">
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
                 <Input placeholder="Title" value={item.title} onChange={e => updateCustomSectionItem(section.id, item.id, 'title', e.target.value)} />

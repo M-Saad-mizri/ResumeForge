@@ -101,6 +101,7 @@ const Auth = () => {
                     <span className="font-display text-xl font-bold text-foreground">ResumeForge</span>
                 </Link>
             </header>
+            <h1 className="sr-only">Sign In to ResumeForge</h1>
 
             {/* Auth card */}
             <div className="flex-1 flex items-center justify-center px-4 py-12">
@@ -111,7 +112,7 @@ const Auth = () => {
                         {showForgot ? (
                             <>
                                 <div className="mb-6">
-                                    <h1 className="font-display text-2xl font-bold text-foreground">Reset password</h1>
+                                    <h2 className="font-display text-2xl font-bold text-foreground">Reset password</h2>
                                     <p className="text-muted-foreground text-sm mt-1">Enter your email to receive a reset link</p>
                                 </div>
                                 <form onSubmit={handleForgotPassword} className="space-y-4">
@@ -150,7 +151,7 @@ const Auth = () => {
                                 {/* Sign In */}
                                 <TabsContent value="signin">
                                     <div className="mb-6">
-                                        <h1 className="font-display text-2xl font-bold text-foreground">Welcome back</h1>
+                                        <h2 className="font-display text-2xl font-bold text-foreground">Welcome back</h2>
                                         <p className="text-muted-foreground text-sm mt-1">Sign in to access your CV profiles</p>
                                     </div>
                                     <GoogleButton loading={googleLoading} onClick={handleGoogle} />
@@ -195,6 +196,7 @@ const Auth = () => {
                                                     className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                                                     onClick={() => setShowPassword(v => !v)}
                                                     tabIndex={-1}
+                                                    aria-label={showPassword ? 'Hide password' : 'Show password'}
                                                 >
                                                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                                                 </button>
@@ -209,7 +211,7 @@ const Auth = () => {
                                 {/* Sign Up */}
                                 <TabsContent value="signup">
                                     <div className="mb-6">
-                                        <h1 className="font-display text-2xl font-bold text-foreground">Create account</h1>
+                                        <h2 className="font-display text-2xl font-bold text-foreground">Create account</h2>
                                         <p className="text-muted-foreground text-sm mt-1">Free forever — no credit card needed</p>
                                     </div>
                                     <GoogleButton loading={googleLoading} onClick={handleGoogle} label="Sign up with Google" />
@@ -245,6 +247,7 @@ const Auth = () => {
                                                     className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                                                     onClick={() => setShowPassword(v => !v)}
                                                     tabIndex={-1}
+                                                    aria-label={showPassword ? 'Hide password' : 'Show password'}
                                                 >
                                                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                                                 </button>
