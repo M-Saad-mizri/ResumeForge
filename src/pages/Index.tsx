@@ -16,6 +16,53 @@ const features = [
   { icon: Palette, title: 'Design Customizer', desc: 'Fine-tune colors, fonts, spacing, and page width to make your CV unique' },
 ];
 
+const homeStructuredData = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebPage',
+      '@id': 'https://getcv.lovable.app/#webpage',
+      url: 'https://getcv.lovable.app/',
+      name: 'ResumeForge - Free AI CV Builder',
+      description:
+        'Free AI-powered CV builder for creating ATS-friendly resumes with professional templates, PDF export, LinkedIn import, and shareable links.',
+      isPartOf: { '@id': 'https://getcv.lovable.app/#website' },
+      about: { '@id': 'https://getcv.lovable.app/#webapp' },
+      inLanguage: 'en',
+    },
+    {
+      '@type': 'FAQPage',
+      '@id': 'https://getcv.lovable.app/#faq',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'Is ResumeForge free to use?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Yes. ResumeForge lets users build, customize, save locally, and export professional CVs for free.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Can I export my CV as a PDF?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Yes. ResumeForge supports PDF export along with HD image, ATS text, Markdown, and JSON export options.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Does ResumeForge support ATS-friendly resumes?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Yes. ResumeForge includes ATS-focused templates and text exports designed for applicant tracking systems.',
+          },
+        },
+      ],
+    },
+  ],
+};
+
 const WorkflowStep = ({ index, icon: Icon, title, description, steps }: {
   index: number;
   icon: React.ElementType;
@@ -55,7 +102,12 @@ const Index = () => {
   const { user } = useAuth();
   return (
     <div className="min-h-screen bg-background" role="main">
-      <SEO canonical="/" />
+      <SEO
+        title="Free AI CV Builder - Create Professional Resumes Online"
+        description="Create a professional, ATS-friendly CV with ResumeForge. Use AI writing help, polished templates, PDF export, LinkedIn import, cloud sync, and shareable resume links."
+        canonical="/"
+        structuredData={homeStructuredData}
+      />
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
         <div className="container mx-auto px-6 py-4 flex items-center justify-between">

@@ -91,6 +91,7 @@ const Auth = () => {
               title="Sign In or Create Account"
               description="Sign in or create a free ResumeForge account to sync your CVs across devices, access cloud storage, and never lose your work."
               canonical="/auth"
+              noindex
             />
             {/* Header */}
             <header className="px-6 py-4 border-b border-border">

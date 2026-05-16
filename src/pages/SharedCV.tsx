@@ -50,7 +50,7 @@ const SharedCV = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <SEO title="Loading Shared CV" noindex />
+        <SEO title="Loading Shared CV" canonical={`/shared/${id ?? ''}`} noindex nofollow />
         <div className="text-center space-y-4">
           <h1 className="sr-only">Loading Shared CV</h1>
           <Loader2 className="w-8 h-8 animate-spin mx-auto text-primary" />
@@ -63,6 +63,7 @@ const SharedCV = () => {
   if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
+        <SEO title="Shared CV Link Not Available" canonical={`/shared/${id ?? ''}`} noindex nofollow />
         <div className="text-center space-y-4 max-w-md px-4">
           <AlertCircle className="w-12 h-12 mx-auto text-destructive" />
           <h1 className="text-xl font-bold text-foreground">Link Not Available</h1>

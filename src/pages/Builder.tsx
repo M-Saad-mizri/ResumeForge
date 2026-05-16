@@ -26,6 +26,34 @@ import { toast } from 'sonner';
 import { CVData, TemplateType, sampleCVData, defaultDesignSettings } from '@/types/cv';
 import { supabase } from '@/integrations/supabase/client';
 
+const builderStructuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  '@id': 'https://getcv.lovable.app/builder#webapp',
+  name: 'ResumeForge CV Builder',
+  url: 'https://getcv.lovable.app/builder',
+  description:
+    'Free online CV builder with AI writing assistance, ATS matching, professional templates, live preview, PDF export, and LinkedIn import.',
+  applicationCategory: 'BusinessApplication',
+  operatingSystem: 'Web',
+  isAccessibleForFree: true,
+  offers: {
+    '@type': 'Offer',
+    price: '0',
+    priceCurrency: 'USD',
+  },
+  featureList: [
+    'AI resume writing assistant',
+    'ATS keyword matching',
+    'Professional CV templates',
+    'PDF resume export',
+    'LinkedIn profile import',
+    'Cloud resume sync',
+    'Shareable CV links',
+  ],
+  inLanguage: 'en',
+};
+
 const Builder = () => {
   const { saveProfile, activeProfile, cvData, template, designSettings, setCVData, setTemplate } = useCV();
   const { user, signOut } = useAuth();
@@ -375,9 +403,10 @@ const Builder = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <SEO
-        title="CV Builder – Edit & Export Your Resume"
-        description="Use the ResumeForge builder to create, edit, and export your professional CV with AI assistance, multiple templates, and real-time preview."
+        title="Free CV Builder - Edit, Preview & Export Your Resume"
+        description="Build and export a professional CV with ResumeForge's free online resume builder. Use AI writing help, ATS matching, templates, live preview, PDF export, and LinkedIn import."
         canonical="/builder"
+        structuredData={builderStructuredData}
       />
       <h1 className="sr-only">CV Builder</h1>
       {/* Top Bar */}

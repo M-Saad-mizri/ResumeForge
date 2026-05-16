@@ -78,7 +78,13 @@ const ResetPassword = () => {
 
     return (
         <div className="min-h-screen bg-background flex flex-col">
-            <SEO title="Reset Password" description="Set a new password for your ResumeForge account to regain access to your saved CV profiles and cloud-synced data." noindex />
+            <SEO
+                title="Reset Password"
+                description="Set a new password for your ResumeForge account to regain access to your saved CV profiles and cloud-synced data."
+                canonical="/reset-password"
+                noindex
+                nofollow
+            />
             <header className="px-6 py-4 border-b border-border">
                 <Link to="/" className="inline-flex items-center gap-2">
                     <div className="w-8 h-8 rounded-lg gradient-gold flex items-center justify-center">
