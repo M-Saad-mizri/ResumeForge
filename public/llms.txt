@@ -1,0 +1,11 @@
+# ResumeForge
+
+> Free AI-powered CV and resume builder with 6 professional templates, ATS optimization, PDF export, LinkedIn import, and smart content suggestions.
+
+ResumeForge is a free web app that lets anyone create, customize, and export a professional CV in minutes. Users can work as a guest with local storage or sign in for cloud sync across devices.
+
+## Pages
+
+- [Home](/): Overview of features, templates, and how the builder works.
+- [Builder](/builder): The interactive CV editor with live preview, templates, design customization, and export options.
+- [Sign In](/auth): Create a free account or sign in (email or Google) to sync CVs across devices.
