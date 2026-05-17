@@ -1,4 +1,5 @@
 import { Helmet } from 'react-helmet-async';
+import { SITE_NAME, absoluteUrl } from '@/config/site';
 
 interface SEOProps {
   title?: string;
@@ -12,9 +13,7 @@ interface SEOProps {
   structuredData?: Record<string, unknown> | Record<string, unknown>[];
 }
 
-const SITE_NAME = 'ResumeForge';
-const BASE_URL = 'https://getcv.lovable.app';
-const DEFAULT_IMAGE = `${BASE_URL}/og-image.svg`;
+const DEFAULT_IMAGE = absoluteUrl('/og-image.svg');
 const DEFAULT_TITLE = 'Free AI CV Builder - Create Professional Resumes Online';
 const DEFAULT_DESCRIPTION =
   'Build a professional CV in minutes with ResumeForge, a free AI-powered resume builder with professional templates, ATS optimization, PDF export, LinkedIn import, and smart content suggestions.';
@@ -31,9 +30,8 @@ const DEFAULT_KEYWORDS = [
 ];
 
 const makeAbsoluteUrl = (path?: string) => {
-  if (!path) return BASE_URL;
-  if (/^https?:\/\//i.test(path)) return path;
-  return `${BASE_URL}${path.startsWith('/') ? path : `/${path}`}`;
+  if (!path) return absoluteUrl('/');
+  return absoluteUrl(path);
 };
 
 const SEO = ({

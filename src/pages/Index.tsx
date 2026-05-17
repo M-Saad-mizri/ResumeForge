@@ -3,6 +3,8 @@ import { FileText, Sparkles, Download, Layout, Shield, Zap, Image, Share2, Uploa
 import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 import SEO from '@/components/SEO';
+import SiteFooter from '@/components/SiteFooter';
+import { absoluteUrl } from '@/config/site';
 
 const features = [
   { icon: Layout, title: 'Multiple Templates', desc: '6 professional templates: Modern, Classic, Minimal, Creative, Executive & ATS-Optimized' },
@@ -21,18 +23,18 @@ const homeStructuredData = {
   '@graph': [
     {
       '@type': 'WebPage',
-      '@id': 'https://getcv.lovable.app/#webpage',
-      url: 'https://getcv.lovable.app/',
+      '@id': absoluteUrl('/#webpage'),
+      url: absoluteUrl('/'),
       name: 'ResumeForge - Free AI CV Builder',
       description:
         'Free AI-powered CV builder for creating ATS-friendly resumes with professional templates, PDF export, LinkedIn import, and shareable links.',
-      isPartOf: { '@id': 'https://getcv.lovable.app/#website' },
-      about: { '@id': 'https://getcv.lovable.app/#webapp' },
+      isPartOf: { '@id': absoluteUrl('/#website') },
+      about: { '@id': absoluteUrl('/#webapp') },
       inLanguage: 'en',
     },
     {
       '@type': 'FAQPage',
-      '@id': 'https://getcv.lovable.app/#faq',
+      '@id': absoluteUrl('/#faq'),
       mainEntity: [
         {
           '@type': 'Question',
@@ -117,6 +119,12 @@ const Index = () => {
             </div>
             <span className="font-display text-xl font-bold text-foreground">ResumeForge</span>
           </Link>
+          <nav aria-label="Primary navigation" className="hidden items-center gap-5 text-sm font-medium md:flex">
+            <Link to="/builder" className="text-muted-foreground transition-colors hover:text-foreground">Builder</Link>
+            <Link to="/blog" className="text-muted-foreground transition-colors hover:text-foreground">Guides</Link>
+            <Link to="/about" className="text-muted-foreground transition-colors hover:text-foreground">About</Link>
+            <Link to="/contact" className="text-muted-foreground transition-colors hover:text-foreground">Contact</Link>
+          </nav>
           <div className="flex items-center gap-2">
             {user ? (
               <Link to="/builder" className="btn-gold rounded-lg text-sm">
@@ -304,12 +312,7 @@ const Index = () => {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-border py-8 px-6">
-        <div className="container mx-auto flex items-center justify-between text-sm text-muted-foreground">
-          <span>© 2026 ResumeForge. Free & Open.</span>
-          <span>Built with ❤️</span>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 };

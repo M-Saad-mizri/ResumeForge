@@ -264,7 +264,11 @@ const Auth = () => {
 
                         {!showForgot && (
                             <p className="text-center text-xs text-muted-foreground mt-6">
-                                By continuing, you agree to our terms of service.
+                                By continuing, you agree to our{' '}
+                                <Link to="/terms-and-conditions" className="text-accent hover:underline">
+                                    terms and conditions
+                                </Link>
+                                .
                             </p>
                         )}
                     </div>

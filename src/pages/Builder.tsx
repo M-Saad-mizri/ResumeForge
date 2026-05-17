@@ -25,13 +25,14 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { CVData, TemplateType, sampleCVData, defaultDesignSettings } from '@/types/cv';
 import { supabase } from '@/integrations/supabase/client';
+import { absoluteUrl } from '@/config/site';
 
 const builderStructuredData = {
   '@context': 'https://schema.org',
   '@type': 'WebApplication',
-  '@id': 'https://getcv.lovable.app/builder#webapp',
+  '@id': absoluteUrl('/builder#webapp'),
   name: 'ResumeForge CV Builder',
-  url: 'https://getcv.lovable.app/builder',
+  url: absoluteUrl('/builder'),
   description:
     'Free online CV builder with AI writing assistance, ATS matching, professional templates, live preview, PDF export, and LinkedIn import.',
   applicationCategory: 'BusinessApplication',
